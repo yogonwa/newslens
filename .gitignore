@@ -1,4 +1,17 @@
-*.pyc
+# System files
+.DS_Store
 __pycache__/
+*.pyc
+
+# Environment
+venv/
 .env
+
+# Project specific
+screenshots/
+wayback_snapshots_*.json
+
+# IDE
+.vscode/
+.idea/
 
