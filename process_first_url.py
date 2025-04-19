@@ -6,6 +6,7 @@ from playwright.sync_api import sync_playwright
 from datetime import datetime
 import os
 import time
+from headline_extractors import get_extractor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,28 +25,20 @@ def load_first_url():
     with open(latest_file, 'r') as f:
         data = json.load(f)
     
-    # Get the first site and its first timestamp
-    first_site = next(iter(data))
-    first_timestamp = next(iter(data[first_site]))
-    url = data[first_site][first_timestamp]['url']
+    # Get Fox News and its first timestamp
+    site = 'foxnews.com'
+    if site not in data:
+        raise ValueError(f"Site {site} not found in snapshot data")
+        
+    first_timestamp = next(iter(data[site]))
+    url = data[site][first_timestamp]['url']
     
-    return url, first_site, first_timestamp
+    return url, site, first_timestamp
 
-def extract_headlines_and_metadata(url: str) -> dict:
-    """Extract headlines and metadata from the archived page."""
+def extract_headlines_and_metadata(url: str, site: str) -> dict:
+    """Extract headlines and metadata from the archived page using source-specific extractor."""
     headers = {
         "User-Agent": "NewsLensBot/0.1 (+https://github.com/yourusername/newslens; contact: your@email.com)"
-    }
-    
-    # Section headers and navigation elements to exclude
-    exclude_headers = {
-        'More top stories', 'International affairs', 'On campus', 'CNN Podcasts',
-        'In the spotlight', 'Check these out', 'For Subscribers', 'CNN Underscored',
-        'Best-in-class', 'Expert-backed guides', 'Editors\' picks', 'Business',
-        'Entertainment', 'Space and Science', 'Travel', 'Style', 'health and wellness',
-        'More Politics', 'US', 'World', 'CNN podcasts', 'Sports', 'Video',
-        'Food and Home', 'Paid Content', 'More from CNN', 'Health', 'Investing',
-        'Photos', 'Paid Partner Content', 'CNN Games + Quizzes', 'In case you missed it'
     }
     
     try:
@@ -57,21 +50,16 @@ def extract_headlines_and_metadata(url: str) -> dict:
         
         soup = BeautifulSoup(html_content, 'html.parser')
         
-        # Extract headlines (h1 and h2 tags)
-        headlines = []
-        for tag in soup.find_all(['h1', 'h2']):
-            text = tag.get_text(strip=True)
-            # Only include headlines that aren't in the exclude list and aren't empty
-            if text and text not in exclude_headers:
-                headlines.append({
-                    'text': text,
-                    'tag': tag.name
-                })
+        # Get the appropriate extractor for this source
+        extractor = get_extractor(site)
+        if not extractor:
+            logging.error(f"No extractor found for source: {site}")
+            return None, html_content
+            
+        # Extract headlines using source-specific extractor
+        headlines = extractor.extract_headlines(soup, url)
         
-        # Extract metadata
         metadata = {
-            'title': soup.title.string if soup.title else None,
-            'description': soup.find('meta', attrs={'name': 'description'})['content'] if soup.find('meta', attrs={'name': 'description'}) else None,
             'headlines': headlines,
             'timestamp': datetime.now().isoformat(),
             'url': url
@@ -184,8 +172,8 @@ def main():
         url, site, timestamp = load_first_url()
         logging.info(f"Processing URL: {url}")
         
-        # Extract headlines and metadata
-        metadata, html_content = extract_headlines_and_metadata(url)
+        # Extract headlines and metadata using source-specific extractor
+        metadata, html_content = extract_headlines_and_metadata(url, site)
         if metadata:
             # Save metadata to JSON
             metadata_file = f'screenshots/{site}_{timestamp}_metadata.json'

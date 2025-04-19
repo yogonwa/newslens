@@ -14,13 +14,38 @@
   - Metadata JSON alongside screenshots
   - Raw HTML saved for debugging purposes
 
+## Latest Progress (Phase 1 - Multi-Source Implementation)
+- [x] CNN Implementation
+  - Headline extraction with semantic structure
+  - Unicode normalization
+  - Subheadline support
+- [x] Fox News Implementation
+  - Headline extraction with semantic structure
+  - Editorial tags/kickers capture
+  - Unicode normalization
+  - Subheadline support
+
 ## Immediate Next Steps
 
-### 1. Refine Metadata Extraction
-- [ ] Improve headline detection accuracy
-  - Create site-specific selectors for main headlines
-  - Filter out navigation/section headers more effectively
-  - Add priority/ranking to headlines based on position/prominence
+### 1. Complete Source Implementations
+- [ ] New York Times Implementation
+  - Create NYTHeadlineExtractor
+  - Analyze and implement site-specific metadata
+  - Test with wayback snapshots
+- [ ] Washington Post Implementation
+  - Create WaPoHeadlineExtractor
+  - Analyze and implement site-specific metadata
+  - Test with wayback snapshots
+- [ ] USA Today Implementation
+  - Create USATodayHeadlineExtractor
+  - Analyze and implement site-specific metadata
+  - Test with wayback snapshots
+
+### 2. Refine Metadata Extraction
+- [x] Improve headline detection accuracy
+  - Created site-specific extractors for CNN and Fox News
+  - Added support for editorial tags/kickers
+  - Implemented Unicode normalization
 - [ ] Add additional metadata fields
   - Article timestamps
   - Author information
@@ -30,7 +55,7 @@
   - Verify accuracy across different sites
   - Handle edge cases (missing data, different layouts)
 
-### 2. Multi-Source Implementation
+### 3. Multi-Source Implementation
 - [ ] Extend scraping to all target news sources:
   - CNN (current prototype)
   - Fox News
@@ -46,7 +71,7 @@
   - Add appropriate delays between requests
   - Handle errors gracefully
 
-### 3. UI Prototype Development
+### 4. UI Prototype Development
 - [ ] Design initial grid-based UI
   - Time-based X-axis (6 snapshots per day)
   - Source-based Y-axis (5 news sources)
@@ -60,7 +85,7 @@
   - Hover previews
   - Side-by-side comparison view
 
-### 4. Storage Implementation
+### 5. Storage Implementation
 - [ ] Design storage schema
   - Screenshot storage strategy (local vs cloud)
   - Metadata database structure
@@ -74,7 +99,7 @@
   - Data retention policy
   - Recovery procedures
 
-### 5. Integration
+### 6. Integration
 - [ ] Create main application loop
   - Scheduled scraping (every 3 hours)
   - Error handling and retry logic
