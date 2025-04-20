@@ -159,6 +159,39 @@ class FoxNewsHeadlineExtractor(HeadlineExtractor):
             logging.error(f"Error extracting Fox News headlines: {e}")
             return []
 
+class NYTHeadlineExtractor(HeadlineExtractor):
+    """New York Times-specific headline extraction"""
+    
+    def extract_headlines(self, soup: BeautifulSoup, base_url: str) -> List[Dict]:
+        headlines = []
+        try:
+            # Find all story wrapper sections
+            story_sections = soup.find_all('section', class_='story-wrapper')
+            
+            for story in story_sections:
+                # Find headline text in indicate-hover paragraph
+                headline_elem = story.find('p', class_='indicate-hover')
+                # Find the link in the story
+                link = story.find('a', href=True)
+                
+                if headline_elem and link:
+                    headline_text = self.clean_text(headline_elem.get_text(strip=True))
+                    article_url = urljoin(base_url, link['href'])
+                    
+                    headlines.append({
+                        'headline': headline_text,
+                        'url': article_url,
+                        'subheadline': None,  # NYT doesn't seem to have these in the new layout
+                        'editorial_tag': None
+                    })
+            
+            # Return top 3 headlines as before
+            return headlines[:3]
+            
+        except Exception as e:
+            logging.error(f"Error extracting NYT headlines: {e}")
+            return []
+
 def get_extractor(source: str) -> Optional[HeadlineExtractor]:
     """Factory function to get the appropriate extractor"""
     # Normalize source name
@@ -169,6 +202,7 @@ def get_extractor(source: str) -> Optional[HeadlineExtractor]:
     extractors = {
         'cnn': CNNHeadlineExtractor(),
         'foxnews': FoxNewsHeadlineExtractor(),
+        'nytimes': NYTHeadlineExtractor(),
         # Add more sources here as they're implemented
     }
     return extractors.get(source) 

@@ -25,8 +25,8 @@ def load_first_url():
     with open(latest_file, 'r') as f:
         data = json.load(f)
     
-    # Get Fox News and its first timestamp
-    site = 'foxnews.com'
+    # Get NYT and its first timestamp
+    site = 'nytimes.com'
     if site not in data:
         raise ValueError(f"Site {site} not found in snapshot data")
         

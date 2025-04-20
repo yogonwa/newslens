@@ -24,14 +24,20 @@
   - Editorial tags/kickers capture
   - Unicode normalization
   - Subheadline support
+- [x] New York Times Implementation
+  - Created NYTHeadlineExtractor
+  - Implemented basic headline extraction
+  - Added test suite for headline extraction
+  - Support for story-wrapper sections
 
 ## Immediate Next Steps
 
 ### 1. Complete Source Implementations
 - [ ] New York Times Implementation
-  - Create NYTHeadlineExtractor
-  - Analyze and implement site-specific metadata
-  - Test with wayback snapshots
+  - [x] Create NYTHeadlineExtractor
+  - [ ] Analyze and implement site-specific metadata
+  - [ ] Test with wayback snapshots
+  - [ ] Add support for additional metadata fields
 - [ ] Washington Post Implementation
   - Create WaPoHeadlineExtractor
   - Analyze and implement site-specific metadata
@@ -52,8 +58,9 @@
   - Article categories/sections
   - Image captions/descriptions
 - [ ] Create test suite for metadata extraction
-  - Verify accuracy across different sites
-  - Handle edge cases (missing data, different layouts)
+  - [x] Basic test suite for NYT implementation
+  - [ ] Verify accuracy across different sites
+  - [ ] Handle edge cases (missing data, different layouts)
 
 ### 3. Multi-Source Implementation
 - [ ] Extend scraping to all target news sources:
