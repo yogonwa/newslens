@@ -192,6 +192,57 @@ class NYTHeadlineExtractor(HeadlineExtractor):
             logging.error(f"Error extracting NYT headlines: {e}")
             return []
 
+class WaPoHeadlineExtractor(HeadlineExtractor):
+    """Washington Post-specific headline extraction"""
+    
+    def extract_headlines(self, soup: BeautifulSoup, base_url: str) -> List[Dict]:
+        headlines = []
+        try:
+            # Find all headline containers - Washington Post uses various container classes
+            headline_containers = soup.find_all(['div', 'article'], class_=['headline', 'story-headline', 'article-headline', 'story'])
+            
+            for container in headline_containers:
+                # Get headline from h2, h3, or headline class
+                headline_elem = container.find(['h2', 'h3']) or container.find(class_=['headline', 'story-headline'])
+                if not headline_elem:
+                    continue
+                    
+                headline_text = self.clean_text(headline_elem.get_text(strip=True))
+                if not headline_text:  # Skip if headline is empty
+                    continue
+                
+                # Find the link element
+                link = container.find('a', href=True)
+                if not link:
+                    continue
+                    
+                # Get article URL and make it absolute
+                article_url = link.get('href', '')
+                if not article_url:  # Skip if URL is empty
+                    continue
+                    
+                # Clean up Wayback Machine URL if present
+                if 'web.archive.org' in article_url:
+                    # Extract the original URL from the Wayback URL
+                    original_url = article_url.split('https://')[-1]
+                    article_url = f'https://{original_url}'
+                else:
+                    article_url = urljoin(base_url, article_url)
+                
+                headlines.append({
+                    'headline': headline_text,
+                    'subheadline': None,  # Simplified - not extracting subheadlines for now
+                    'editorial_tag': None,
+                    'url': article_url
+                })
+            
+            # Return top 3 headlines
+            return headlines[:3]
+            
+        except Exception as e:
+            logging.error(f"Error extracting Washington Post headlines: {e}")
+            return []
+
 def get_extractor(source: str) -> Optional[HeadlineExtractor]:
     """Factory function to get the appropriate extractor"""
     # Normalize source name
@@ -203,6 +254,7 @@ def get_extractor(source: str) -> Optional[HeadlineExtractor]:
         'cnn': CNNHeadlineExtractor(),
         'foxnews': FoxNewsHeadlineExtractor(),
         'nytimes': NYTHeadlineExtractor(),
+        'washingtonpost': WaPoHeadlineExtractor(),
         # Add more sources here as they're implemented
     }
     return extractors.get(source) 
