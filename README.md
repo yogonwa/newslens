@@ -1,86 +1,120 @@
 # NewsLens
 
-NewsLens is a tool to capture, archive, and analyze the homepages of major news websites. The goal is 
-to visually and textually track how different sources frame and present news events throughout the day.
+NewsLens is a comprehensive news analysis platform that captures and analyzes news headlines from multiple sources over time. It combines Wayback Machine archiving with live site scraping to provide a historical perspective on news coverage.
 
 ## Features
 
-Current:
-- Wayback Machine integration for historical data bootstrapping
-- Homepage screenshot capture (above-the-fold and full-page)
-- Headline and metadata extraction
-- Support for multiple news sources (CNN, Fox News, NYT, WaPo, USA Today)
-
-Coming Soon:
-- Time-grid visual UI for easy comparison
-- Sentiment and framing analysis
-- Advanced search and filtering
-- Historical trends and patterns
-
-## Project Status
-
-Currently in Phase 0 (Prototype):
-- ✅ Wayback Machine CDX API integration
-- ✅ Screenshot capture using Playwright
-- ✅ Basic metadata extraction
-- 🚧 Refining headline detection
-- 🚧 Multi-source implementation
-
-## Setup
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yogonwa/newslens.git
-cd newslens
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-playwright install
-```
-
-3. Run the scraper:
-```bash
-python process_first_url.py
-```
+- **Multi-Source Support**: Currently supports CNN, Fox News, New York Times, Washington Post, and USA Today
+- **Historical Analysis**: Captures news snapshots at regular intervals
+- **Priority-Based Headlines**: Categorizes and prioritizes headlines based on importance
+- **Interactive UI**: Grid-based interface for comparing news coverage
+- **Metadata Extraction**: Captures headlines, subheadlines, editorial tags, and categories
 
 ## Project Structure
 
 ```
 newslens/
-├── docs/
-│   ├── NewsLens_Project_Brief.md   # Detailed project overview
-│   └── TODO.md                     # Development roadmap
-├── wayback_scraper.py             # Wayback Machine CDX API scraper
-├── process_first_url.py           # Screenshot and metadata processor
-├── requirements.txt               # Python dependencies
-└── screenshots/                   # Generated screenshots and metadata
+├── backend/                    # Backend services and scrapers
+│   ├── scrapers/              # Scraper implementations
+│   │   ├── wayback/          # Wayback Machine scraping
+│   │   ├── live/            # Live site scraping
+│   │   └── extractors/      # Headline extractors
+│   ├── services/            # Business logic
+│   └── api/                 # API endpoints
+├── frontend/                 # UI application
+│   ├── src/                 # React application
+│   │   ├── components/      # UI components
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API clients
+│   │   └── utils/          # Helper functions
+│   └── public/             # Static assets
+├── shared/                  # Shared code between frontend/backend
+│   ├── types/              # Type definitions
+│   └── constants/          # Shared constants
+├── scripts/                # Utility scripts
+├── tests/                  # Test suite
+│   ├── backend/
+│   └── frontend/
+├── docs/                   # Documentation
+└── config/                 # Configuration files
 ```
 
-## Generated Files
+## Getting Started
 
-The scraper generates three types of files for each capture:
-- `{site}_{timestamp}.png` - Above-the-fold screenshot (1920x1080)
-- `{site}_{timestamp}_metadata.json` - Extracted headlines and metadata
-- `{site}_{timestamp}_raw.html` - Raw HTML for debugging
+### Prerequisites
+
+- Python 3.9+
+- Node.js 16+
+- npm or yarn
+
+### Backend Setup
+
+1. Create and activate virtual environment:
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Configure environment variables:
+```bash
+cp config/development.yaml.example config/development.yaml
+# Edit development.yaml with your settings
+```
+
+### Frontend Setup
+
+1. Install dependencies:
+```bash
+cd frontend
+npm install
+```
+
+2. Start development server:
+```bash
+npm run dev
+```
+
+## Development Status
+
+### Completed
+- [x] Project structure and organization
+- [x] Multi-source headline extraction
+- [x] Priority-based headline sorting
+- [x] Basic UI prototype
+
+### In Progress
+- [ ] Backend API implementation
+- [ ] Frontend-backend integration
+- [ ] Storage system implementation
+
+### Planned
+- [ ] User authentication
+- [ ] Advanced analytics
+- [ ] Mobile responsiveness
+- [ ] API documentation
 
 ## Contributing
 
-See [TODO.md](docs/TODO.md) for the current development roadmap and areas where help is needed.
-
-## Future Plans
-
-- Implement grid-based UI for visual comparison
-- Add AI-powered analysis of coverage differences
-- Create API for researchers and analysts
-- Develop advanced comparison tools
-- Add mobile-responsive design
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-[License details to be added]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contact
+## Acknowledgments
 
-[Contact information to be added]
+- [Wayback Machine](https://archive.org/web/) for providing archived web content
+- [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) for HTML parsing
+- [Playwright](https://playwright.dev/) for browser automation
+- [React](https://reactjs.org/) for frontend development
+- [Tailwind CSS](https://tailwindcss.com/) for styling
