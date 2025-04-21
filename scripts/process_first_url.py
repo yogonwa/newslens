@@ -7,6 +7,8 @@ from datetime import datetime
 import os
 import time
 from headline_extractors import get_extractor
+import asyncio
+from playwright.async_api import async_playwright
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,8 +27,8 @@ def load_first_url():
     with open(latest_file, 'r') as f:
         data = json.load(f)
     
-    # Get NYT and its first timestamp
-    site = 'nytimes.com'
+    # Get USA Today and its first timestamp
+    site = 'usatoday.com'
     if site not in data:
         raise ValueError(f"Site {site} not found in snapshot data")
         
@@ -57,12 +59,13 @@ def extract_headlines_and_metadata(url: str, site: str) -> dict:
             return None, html_content
             
         # Extract headlines using source-specific extractor
-        headlines = extractor.extract_headlines(soup, url)
+        headlines = extractor.extract_headlines(soup, f"https://www.{site}")
         
         metadata = {
             'headlines': headlines,
             'timestamp': datetime.now().isoformat(),
-            'url': url
+            'url': url,
+            'source': site
         }
         
         return metadata, html_content
@@ -168,11 +171,11 @@ def take_screenshot(url: str, site: str, timestamp: str):
 
 def main():
     try:
-        # Load the first URL
+        # Load the USA Today URL
         url, site, timestamp = load_first_url()
         logging.info(f"Processing URL: {url}")
         
-        # Extract headlines and metadata using source-specific extractor
+        # Extract headlines and metadata using USA Today extractor
         metadata, html_content = extract_headlines_and_metadata(url, site)
         if metadata:
             # Save metadata to JSON
@@ -180,6 +183,16 @@ def main():
             with open(metadata_file, 'w') as f:
                 json.dump(metadata, f, indent=2)
             logging.info(f"Metadata saved to {metadata_file}")
+            
+            # Print extracted headlines for review
+            print("\nExtracted Headlines:")
+            for i, headline in enumerate(metadata['headlines'], 1):
+                print(f"\n{i}. {headline['headline']}")
+                if headline.get('subheadline'):
+                    print(f"   Subheadline: {headline['subheadline']}")
+                if headline.get('editorial_tag'):
+                    print(f"   Tag: {headline['editorial_tag']}")
+                print(f"   URL: {headline['url']}")
             
             # Save raw HTML
             html_file = f'screenshots/{site}_{timestamp}_raw.html'
