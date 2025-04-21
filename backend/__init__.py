@@ -1,0 +1,3 @@
+"""
+NewsLens Backend Package
+""" 
