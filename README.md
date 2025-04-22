@@ -20,6 +20,7 @@ newslens/
 │   │   ├── live/            # Live site scraping
 │   │   └── extractors/      # Headline extractors
 │   ├── services/            # Business logic
+│   ├── models/             # Database models
 │   └── api/                 # API endpoints
 ├── frontend/                 # UI application
 │   ├── src/                 # React application
@@ -46,6 +47,7 @@ newslens/
 - Python 3.9+
 - Node.js 16+
 - npm or yarn
+- MongoDB Atlas account (free tier sufficient)
 
 ### Backend Setup
 
@@ -61,10 +63,17 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Configure environment variables:
+3. Set up MongoDB Atlas:
+- Create a free MongoDB Atlas account
+- Create a new cluster
+- Set up database access (username/password)
+- Configure network access
+- Get your connection string
+
+4. Configure environment variables:
 ```bash
-cp config/development.yaml.example config/development.yaml
-# Edit development.yaml with your settings
+cp .env.example .env
+# Edit .env with your MongoDB Atlas connection string and other settings
 ```
 
 ### Frontend Setup
@@ -87,11 +96,15 @@ npm run dev
 - [x] Multi-source headline extraction
 - [x] Priority-based headline sorting
 - [x] Basic UI prototype
+- [x] MongoDB Atlas setup and configuration
+- [x] Database schema design
+- [x] Basic database operations implementation
 
 ### In Progress
-- [ ] Backend API implementation
+- [ ] Complete database operations layer
+- [ ] Storage service integration
+- [ ] API implementation
 - [ ] Frontend-backend integration
-- [ ] Storage system implementation
 
 ### Planned
 - [ ] User authentication
@@ -118,3 +131,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Playwright](https://playwright.dev/) for browser automation
 - [React](https://reactjs.org/) for frontend development
 - [Tailwind CSS](https://tailwindcss.com/) for styling
+- [MongoDB](https://www.mongodb.com/) for database

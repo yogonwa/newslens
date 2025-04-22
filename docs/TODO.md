@@ -9,6 +9,7 @@ newslens/
 │   │   ├── live/            # Live site scraping
 │   │   └── extractors/      # Headline extractors
 │   ├── services/            # Business logic
+│   ├── models/             # Database models
 │   └── api/                 # API endpoints
 ├── frontend/                 # UI application
 │   ├── src/                 # React application
@@ -76,64 +77,64 @@ newslens/
     - Implemented priority-based sorting system
     - Added metadata extraction (categories, timestamps, etc.)
 
+### Database Implementation Progress
+- [x] Set up MongoDB Atlas
+  - Created cluster and database
+  - Configured connection string
+  - Implemented connection testing
+  - Merged environment configurations
+- [x] Implement database schema
+  - Created NewsSource model
+  - Created Headline model
+  - Created Screenshot model
+  - Defined indexes and relationships
+- [ ] Create data access layer
+  - Implemented basic CRUD operations
+  - Set up connection pooling
+  - Need to add query builders
+
 ## Immediate Next Steps
 
-### 1. Backend Setup
-- [ ] Create virtual environment
-  - Set up Python 3.9+ environment
-  - Install required dependencies
-  - Configure development environment
-- [ ] Implement storage service
-  - Design database schema
-  - Create storage interface
-  - Implement file system storage
-- [ ] Create API layer
-  - Set up FastAPI framework
-  - Define API endpoints
-  - Implement authentication
+### 1. Database Implementation
+- [ ] Complete data access layer
+  - Add remaining CRUD operations
+  - Implement query builders
+  - Add data validation
+  - Set up error handling
+- [ ] Add data migration scripts
+  - Create initial data seeding
+  - Add backup procedures
+  - Implement version control for schema
 
-### 2. Frontend Development
-- [ ] Set up development environment
-  - Install Node.js dependencies
-  - Configure TypeScript
-  - Set up Tailwind CSS
-- [ ] Implement API integration
-  - Create API client services
+### 2. Storage Service
+- [ ] Implement file storage
+  - Create screenshot storage service
+  - Set up directory structure
+  - Implement cleanup routines
+- [ ] Add data retention
+  - Implement archiving strategy
+  - Set up cleanup schedules
+  - Add backup procedures
+
+### 3. API Development
+- [ ] Create API endpoints
+  - Headline retrieval
+  - Source management
+  - Screenshot access
+- [ ] Implement authentication
+  - Add API key support
+  - Set up rate limiting
+  - Add request validation
+
+### 4. Frontend Integration
+- [ ] Connect to backend
+  - Create API client
+  - Implement data fetching
   - Add error handling
-  - Implement loading states
-- [ ] Enhance UI components
-  - Add priority-based headline display
-  - Implement category filtering
-  - Add hover previews
-  - Create side-by-side comparison view
-
-### 3. Testing and Quality Assurance
-- [ ] Backend testing
-  - Expand test coverage for extractors
-  - Add unit tests for services
-  - Implement API tests
-- [ ] Frontend testing
-  - Add component tests
-  - Implement integration tests
-  - Add end-to-end tests
-- [ ] Performance testing
-  - Test scraping performance
-  - Measure API response times
-  - Optimize image loading
-
-### 4. Deployment Preparation
-- [ ] Environment configuration
-  - Create production config
-  - Set up environment variables
-  - Configure logging
-- [ ] CI/CD setup
-  - Configure GitHub Actions
-  - Add automated testing
-  - Set up deployment pipeline
-- [ ] Monitoring
-  - Implement error tracking
-  - Set up performance monitoring
-  - Configure alerts
+- [ ] Enhance UI
+  - Add loading states
+  - Implement error boundaries
+  - Add data visualization
 
 ## Future Considerations
 - Analytics and insights generation
@@ -148,9 +149,9 @@ newslens/
 - API access for researchers
 
 ## Notes
-- Current focus is on backend setup and frontend development
-- Need to determine optimal storage solution for screenshots and metadata
-- Consider implementing a logging system for better debugging
-- May need to adjust screenshot dimensions based on common device sizes
+- Using local MongoDB for development
+- Will implement data retention to manage storage
+- Screenshots will be stored in filesystem with MongoDB references
+- API will be versioned from the start
 - Consider implementing a configuration file for easy adjustments
 - Priority system may need refinement based on user feedback 
