@@ -7,11 +7,8 @@ load_dotenv()
 
 # MongoDB Configuration
 MONGO_CONFIG: Dict[str, Any] = {
-    'host': os.getenv('MONGO_HOST', 'localhost'),
-    'port': int(os.getenv('MONGO_PORT', 27017)),
+    'uri': os.getenv('MONGO_URI', 'mongodb://localhost:27017'),
     'database': os.getenv('MONGO_DB', 'newslens'),
-    'username': os.getenv('MONGO_USER', ''),
-    'password': os.getenv('MONGO_PASSWORD', ''),
 }
 
 # Collection Names

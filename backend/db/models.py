@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from bson import ObjectId
 
 class HeadlineMetadata(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     font_size: Optional[str] = None
     color: Optional[str] = None
     is_breaking: bool = False
@@ -12,6 +13,7 @@ class HeadlineMetadata(BaseModel):
     article_url: Optional[str] = None
 
 class Headline(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     text: str
     type: str
     position: int
@@ -19,6 +21,7 @@ class Headline(BaseModel):
     metadata: Optional[HeadlineMetadata] = None
 
 class Screenshot(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     url: str
     format: str
     size: int
@@ -26,6 +29,7 @@ class Screenshot(BaseModel):
     wayback_url: Optional[str] = None
 
 class HeadlineMetadata(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     page_title: str
     url: str
     wayback_url: Optional[str] = None
@@ -38,6 +42,7 @@ class HeadlineMetadata(BaseModel):
     original_timestamp: Optional[datetime] = None
 
 class HeadlineDocument(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     source_id: ObjectId
     display_timestamp: datetime
     actual_timestamp: datetime
@@ -48,6 +53,7 @@ class HeadlineDocument(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SourceMetadata(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     screenshot_path: Optional[str] = None
     last_updated: Optional[datetime] = None
     timezone: str = "America/New_York"
@@ -58,6 +64,7 @@ class SourceMetadata(BaseModel):
     live_scrape_enabled: bool = True
 
 class SourceDocument(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     name: str
     url: str
     active: bool = True

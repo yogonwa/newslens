@@ -20,16 +20,9 @@ class MongoDBConnection:
     def _connect(self):
         """Establish connection to MongoDB."""
         try:
-            # Construct connection string
-            connection_string = f"mongodb://{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}"
-            
-            # Add authentication if credentials are provided
-            if MONGO_CONFIG['username'] and MONGO_CONFIG['password']:
-                connection_string = f"mongodb://{MONGO_CONFIG['username']}:{MONGO_CONFIG['password']}@{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}"
-            
-            self._client = MongoClient(connection_string)
+            self._client = MongoClient(MONGO_CONFIG['uri'])
             self._db = self._client[MONGO_CONFIG['database']]
-            print(f"Connected to MongoDB at {MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}")
+            print(f"Connected to MongoDB at {MONGO_CONFIG['uri']}")
         except Exception as e:
             print(f"Error connecting to MongoDB: {e}")
             raise
