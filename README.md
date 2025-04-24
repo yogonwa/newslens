@@ -67,7 +67,7 @@ The scraper generates three types of files for each capture:
 
 ## Contributing
 
-See [TODO.md](docs/TODO.md) for the current development roadmap and areas where help is needed.
+See [TODO.md](docs/TODO.md) for the current development roadmap.
 
 ## Future Plans
 
