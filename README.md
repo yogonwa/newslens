@@ -4,11 +4,19 @@ NewsLens is a comprehensive news analysis platform that captures and analyzes ne
 
 ## Features
 
-- **Multi-Source Support**: Currently supports CNN, Fox News, New York Times, Washington Post, and USA Today
-- **Historical Analysis**: Captures news snapshots at regular intervals
-- **Priority-Based Headlines**: Categorizes and prioritizes headlines based on importance
-- **Interactive UI**: Grid-based interface for comparing news coverage
-- **Metadata Extraction**: Captures headlines, subheadlines, editorial tags, and categories
+### MVP (Current Focus)
+- **Visual News Comparison**: Single-column grid showing 5 major news sources at one point in time
+- **Above-Fold Screenshots**: Captured from Wayback Machine archives
+- **Editorial Context**: Headlines and editorial tags for each snapshot
+- **Precise Timing**: Group snapshots by target time while preserving actual capture times
+- **Interactive UI**: Thumbnail grid with expandable detailed views
+
+### Future Enhancements
+- Multi-column time progression view
+- Sentiment analysis and emotional intensity tracking
+- Topic clustering and theme analysis
+- AI-powered querying and insights
+- Timeline playback and historical comparison
 
 ## Project Structure
 
@@ -17,25 +25,22 @@ newslens/
 ├── backend/                    # Backend services and scrapers
 │   ├── scrapers/              # Scraper implementations
 │   │   ├── wayback/          # Wayback Machine scraping
-│   │   ├── live/            # Live site scraping
 │   │   └── extractors/      # Headline extractors
-│   ├── services/            # Business logic
-│   ├── models/             # Database models
+│   ├── services/            # Business logic & S3 service
+│   ├── models/             # MongoDB models
 │   └── api/                 # API endpoints
-├── frontend/                 # UI application
-│   ├── src/                 # React application
+├── frontend/                 # React application
+│   ├── src/                 # Source code
 │   │   ├── components/      # UI components
 │   │   ├── pages/          # Page components
 │   │   ├── services/       # API clients
 │   │   └── utils/          # Helper functions
 │   └── public/             # Static assets
-├── shared/                  # Shared code between frontend/backend
+├── shared/                  # Shared code
 │   ├── types/              # Type definitions
 │   └── constants/          # Shared constants
 ├── scripts/                # Utility scripts
 ├── tests/                  # Test suite
-│   ├── backend/
-│   └── frontend/
 ├── docs/                   # Documentation
 └── config/                 # Configuration files
 ```
@@ -47,7 +52,8 @@ newslens/
 - Python 3.9+
 - Node.js 16+
 - npm or yarn
-- MongoDB Atlas account (free tier sufficient)
+- MongoDB Atlas account
+- AWS account (for S3)
 
 ### Backend Setup
 
@@ -63,17 +69,10 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Set up MongoDB Atlas:
-- Create a free MongoDB Atlas account
-- Create a new cluster
-- Set up database access (username/password)
-- Configure network access
-- Get your connection string
-
-4. Configure environment variables:
+3. Configure environment variables:
 ```bash
 cp .env.example .env
-# Edit .env with your MongoDB Atlas connection string and other settings
+# Edit .env with your MongoDB and AWS credentials
 ```
 
 ### Frontend Setup
@@ -93,24 +92,37 @@ npm run dev
 
 ### Completed
 - [x] Project structure and organization
-- [x] Multi-source headline extraction
-- [x] Priority-based headline sorting
-- [x] Basic UI prototype
-- [x] MongoDB Atlas setup and configuration
-- [x] Database schema design
-- [x] Basic database operations implementation
+- [x] MongoDB Atlas setup
+- [x] Basic wayback scraping functionality
+- [x] Frontend component prototypes
 
 ### In Progress
-- [ ] Complete database operations layer
-- [ ] Storage service integration
-- [ ] API implementation
-- [ ] Frontend-backend integration
+- [ ] S3 integration for screenshot storage
+- [ ] Above-fold screenshot capture
+- [ ] Headline extraction improvements
+- [ ] Single-column grid view
+- [ ] Detail view implementation
 
-### Planned
-- [ ] User authentication
-- [ ] Advanced analytics
-- [ ] Mobile responsiveness
-- [ ] API documentation
+### Next Steps
+1. Infrastructure Setup
+   - Configure AWS S3
+   - Update MongoDB schema
+   - Create S3 service
+
+2. Data Collection
+   - Update wayback scraper
+   - Implement metadata extraction
+   - Add timestamp grouping
+
+3. Frontend Implementation
+   - Simplify grid view
+   - Create detail view
+   - Add hover states
+
+4. Integration & Deployment
+   - Connect all components
+   - Test workflow
+   - Deploy MVP
 
 ## Contributing
 
@@ -132,3 +144,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [React](https://reactjs.org/) for frontend development
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [MongoDB](https://www.mongodb.com/) for database
+- [AWS S3](https://aws.amazon.com/s3/) for image storage
