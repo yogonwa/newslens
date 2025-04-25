@@ -1,157 +1,137 @@
 # NewsLens Project - Progress and TODO
 
+## Current MVP Focus
+Single-column grid showing 5 major news sources at one point in time, with expandable views showing headlines and editorial context. Screenshots are cropped to above-fold content and grouped by target timestamp.
+
 ## Project Structure
 ```
 newslens/
 ├── backend/                    # Backend services and scrapers
 │   ├── scrapers/              # Scraper implementations
 │   │   ├── wayback/          # Wayback Machine scraping
-│   │   ├── live/            # Live site scraping
 │   │   └── extractors/      # Headline extractors
-│   ├── services/            # Business logic
-│   ├── models/             # Database models
+│   ├── services/            # Business logic & S3 service
+│   ├── models/             # MongoDB models
 │   └── api/                 # API endpoints
-├── frontend/                 # UI application
-│   ├── src/                 # React application
+├── frontend/                 # React application
+│   ├── src/                 # Source code
 │   │   ├── components/      # UI components
 │   │   ├── pages/          # Page components
 │   │   ├── services/       # API clients
 │   │   └── utils/          # Helper functions
 │   └── public/             # Static assets
-├── shared/                  # Shared code between frontend/backend
+├── shared/                  # Shared code
 │   ├── types/              # Type definitions
 │   └── constants/          # Shared constants
 ├── scripts/                # Utility scripts
 ├── tests/                  # Test suite
-│   ├── backend/
-│   └── frontend/
 ├── docs/                   # Documentation
 └── config/                 # Configuration files
 ```
 
-## Completed Work (Phase 0 - Wayback Machine Prototype)
-- [x] Created initial Wayback Machine CDX API scraper
-- [x] Implemented screenshot capture functionality using Playwright
-  - Successfully capturing "above the fold" (1920x1080) viewport
-  - Also saving full-page screenshots for reference
-- [x] Basic metadata extraction
-  - Page title and description
-  - Initial headline extraction
-  - Raw HTML storage for debugging
-- [x] File organization
-  - Screenshots stored in `screenshots/` directory
-  - Metadata JSON alongside screenshots
-  - Raw HTML saved for debugging purposes
+## Completed Work
+- [x] Project structure and organization
+- [x] MongoDB Atlas setup and configuration
+- [x] Basic wayback scraping functionality
+- [x] Frontend component prototypes
+- [x] Initial headline extraction implementation
+- [x] Documentation updates for MVP focus
 
-## Latest Progress (Phase 1 - Multi-Source Implementation)
-- [x] Project Restructuring
-  - Organized code into backend/frontend structure
-  - Moved UI prototype into frontend/
-  - Created dedicated directories for scrapers, tests, and scripts
-  - Updated documentation to reflect new structure
+## Current Progress (MVP Phase)
 
-- [x] Source Implementations
-  - CNN Implementation
-    - Headline extraction with semantic structure
-    - Unicode normalization
-    - Subheadline support
-  - Fox News Implementation
-    - Headline extraction with semantic structure
-    - Editorial tags/kickers capture
-    - Unicode normalization
-    - Subheadline support
-  - New York Times Implementation
-    - Created NYTHeadlineExtractor
-    - Implemented basic headline extraction
-    - Added test suite for headline extraction
-    - Support for story-wrapper sections
-  - Washington Post Implementation
-    - Created WaPoHeadlineExtractor
-    - Implemented basic headline extraction
-    - Added support for Wayback Machine URL handling
-    - Simplified to focus on core headline extraction
-  - USA Today Implementation
-    - Created USATodayHeadlineExtractor
-    - Implemented comprehensive headline extraction
-    - Added support for multiple content structures
-    - Implemented priority-based sorting system
-    - Added metadata extraction (categories, timestamps, etc.)
+### Infrastructure & Storage
+- [ ] AWS S3 Setup
+  - [ ] Create S3 bucket for screenshots
+  - [ ] Configure IAM roles and permissions
+  - [ ] Set up environment variables
+  - [ ] Create S3 service class
+  - [ ] Implement upload/download utilities
+  - [ ] Add thumbnail generation
 
-### Database Implementation Progress
-- [x] Set up MongoDB Atlas
-  - Created cluster and database
-  - Configured connection string
-  - Implemented connection testing
-  - Merged environment configurations
-- [x] Implement database schema
-  - Created NewsSource model
-  - Created Headline model
-  - Created Screenshot model
-  - Defined indexes and relationships
-- [ ] Create data access layer
-  - Implemented basic CRUD operations
-  - Set up connection pooling
-  - Need to add query builders
+### MongoDB Schema Updates
+- [ ] Update schema for MVP focus
+  - [ ] Revise snapshot model for S3 integration
+  - [ ] Add timestamp grouping support
+  - [ ] Update source configuration model
+  - [ ] Add indexes for efficient querying
+  - [ ] Implement data validation
 
-## Immediate Next Steps
+### Data Collection
+- [ ] Wayback Scraper Improvements
+  - [ ] Modify for above-fold capture only
+  - [ ] Add screenshot cropping/resizing
+  - [ ] Enhance headline extraction
+  - [ ] Implement editorial tag detection
+  - [ ] Improve timestamp grouping logic
+  - [ ] Add S3 upload integration
 
-### 1. Database Implementation
-- [ ] Complete data access layer
-  - Add remaining CRUD operations
-  - Implement query builders
-  - Add data validation
-  - Set up error handling
-- [ ] Add data migration scripts
-  - Create initial data seeding
-  - Add backup procedures
-  - Implement version control for schema
+### Frontend MVP Components
+- [ ] Grid View Simplification
+  - [ ] Reduce to single column
+  - [ ] Add hover states with timestamps
+  - [ ] Implement loading states
+  - [ ] Add error handling
+  - [ ] Create placeholder components
 
-### 2. Storage Service
-- [ ] Implement file storage
-  - Create screenshot storage service
-  - Set up directory structure
-  - Implement cleanup routines
-- [ ] Add data retention
-  - Implement archiving strategy
-  - Set up cleanup schedules
-  - Add backup procedures
+- [ ] Detail View Implementation
+  - [ ] Create expandable view component
+  - [ ] Add headline list display
+  - [ ] Show editorial context
+  - [ ] Implement image loading states
+  - [ ] Add error boundaries
 
-### 3. API Development
-- [ ] Create API endpoints
-  - Headline retrieval
-  - Source management
-  - Screenshot access
-- [ ] Implement authentication
-  - Add API key support
-  - Set up rate limiting
-  - Add request validation
+### API Development
+- [ ] Core Endpoints
+  - [ ] Snapshot retrieval by timestamp
+  - [ ] S3 presigned URL generation
+  - [ ] Source configuration endpoint
+  - [ ] Health check implementation
+  - [ ] Basic error handling
+  - [ ] Simple caching layer
 
-### 4. Frontend Integration
-- [ ] Connect to backend
-  - Create API client
-  - Implement data fetching
-  - Add error handling
-- [ ] Enhance UI
-  - Add loading states
-  - Implement error boundaries
-  - Add data visualization
+### Testing & Quality
+- [ ] Test Implementation
+  - [ ] S3 service unit tests
+  - [ ] API integration tests
+  - [ ] Frontend component tests
+  - [ ] Screenshot processing tests
+  - [ ] Error handling tests
 
-## Future Considerations
-- Analytics and insights generation
-  - Category distribution analysis
-  - Priority trend analysis
-  - Source comparison by category
-- User authentication system
-- Advanced comparison tools
-- AI-powered analysis of coverage differences
-- Export and sharing capabilities
-- Mobile-responsive design
-- API access for researchers
+## Next Steps (Prioritized)
+
+1. **Storage Infrastructure** (Foundation)
+   - Set up AWS S3 bucket and permissions
+   - Create S3 service for managing screenshots
+   - Update MongoDB schema for S3 references
+   - Implement thumbnail generation
+   - Configure AWS credentials
+
+2. **Data Collection** (Content)
+   - Update wayback scraper for above-fold capture
+   - Implement screenshot processing
+   - Enhance headline extraction
+   - Add S3 upload integration
+   - Test with multiple sources
+
+3. **API & Frontend** (Display)
+   - Create core API endpoints
+   - Update frontend for real data
+   - Implement simplified grid
+   - Add detail view
+   - Test end-to-end flow
+
+## Future Enhancements (Post-MVP)
+- Expand to multi-column time grid (5x5)
+- Add sentiment analysis
+- Implement topic clustering
+- Create timeline playback
+- Add AI-powered querying
+- Enhance mobile responsiveness
+- Add data export capabilities
 
 ## Notes
-- Using local MongoDB for development
-- Will implement data retention to manage storage
-- Screenshots will be stored in filesystem with MongoDB references
-- API will be versioned from the start
-- Consider implementing a configuration file for easy adjustments
-- Priority system may need refinement based on user feedback 
+- Using AWS S3 for screenshot storage
+- MongoDB for metadata and references
+- Focus on above-fold screenshots for MVP
+- Grouping snapshots by target timestamp
+- Preserving actual capture times in metadata 
