@@ -15,3 +15,10 @@ wayback_snapshots_*.json
 .vscode/
 .idea/
 node_modules/
+
+# Ignore all PNG images in backend/tests
+backend/tests/*.png
+
+# Do not ignore scripts and metadata
+!backend/tests/snapshot_metadata.json
+!backend/tests/upload_images_and_generate_metadata.py
