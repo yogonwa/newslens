@@ -1,5 +1,10 @@
 # NewsLens Project - Progress and TODO
 
+## Recent Progress (This Session)
+- Connected 5 mockdata images to S3 and rendered them directly in the UI.
+- Attempted to seed MongoDB with 5 instances containing headlines and associated S3 links.
+- In progress: Unable to get MongoDB data connected to the UI. Remaining step is to get MongoDB connected to the UI to render headlines and S3 images correctly.
+
 ## Current MVP Focus
 Single-column grid showing 5 major news sources at one point in time, with expandable views showing headlines and editorial context. Screenshots are cropped to above-fold content and grouped by target timestamp.
 
@@ -61,6 +66,7 @@ newslens/
 - [ ] Integrate real headlines and editorial tags
 - [ ] Enhance error handling and loading states
 - [ ] Prepare for production deployment
+- [ ] Connect MongoDB headline and S3 data to UI for rendering
 
 ## Notes
 - MVP grid is visually and functionally complete for demo

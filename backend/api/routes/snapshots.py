@@ -1,42 +1,37 @@
 from fastapi import APIRouter
+from backend.db.operations import db_ops
 from backend.services.s3_service import S3Service
-import os
-import json
-from pathlib import Path
+from datetime import datetime
 
 router = APIRouter()
-
-TESTS_DIR = Path(__file__).parent.parent.parent / "tests"
-METADATA_PATH = TESTS_DIR / "snapshot_metadata.json"
 
 @router.get("/snapshots")
 def get_snapshots():
     s3_service = S3Service()
-    with open(METADATA_PATH, "r") as f:
-        metadata = json.load(f)
-    
-    # Build response for frontend
+    # Fetch all headline documents for the MVP timeslot (6 AM, April 18, 2025)
+    # You can generalize this filter as needed
+    display_timestamp = datetime.strptime("20250418060000", "%Y%m%d%H%M%S")
+    docs = db_ops.headlines.find({"display_timestamp": display_timestamp})
     response = []
-    for entry in metadata:
-        source_id = entry["source"]
-        timestamp = entry["timestamp"]
-        s3_key = entry["s3_key"]
-        thumbnail_key = entry["thumbnail_key"]
+    for doc in docs:
+        # Main headline is the first in the list, subheadlines are the rest
+        headlines = doc.get("headlines", [])
+        main_headline = headlines[0]["text"] if headlines else ""
+        sub_headlines = [h["text"] for h in headlines[1:]] if len(headlines) > 1 else []
+        # S3 keys from MongoDB
+        s3_key = doc["screenshot"]["url"]
+        thumbnail_key = doc["screenshot"].get("thumbnail_url", s3_key)
         # Generate presigned URLs
         image_url = s3_service.generate_presigned_url(s3_key, expires_in=3600)
         thumbnail_url = s3_service.generate_presigned_url(thumbnail_key, expires_in=3600)
-        # Placeholder headlines
-        main_headline = f"Top story from {source_id.title()}"
-        sub_headlines = [f"Secondary headline for {source_id}"]
-        # Unique ID for frontend
-        snapshot_id = f"{source_id}-20250418-0600"
         response.append({
-            "id": snapshot_id,
-            "sourceId": source_id,
-            "timestamp": timestamp,
+            "id": str(doc["_id"]),
+            "sourceId": str(doc["source_id"]),
+            "timestamp": doc["display_timestamp"].isoformat(),
             "mainHeadline": main_headline,
             "subHeadlines": sub_headlines,
             "imageUrl": image_url,
-            "thumbnailUrl": thumbnail_url
+            "thumbnailUrl": thumbnail_url,
+            "sentiment": {"score": 0, "magnitude": 0.5}  # Placeholder
         })
     return response 
