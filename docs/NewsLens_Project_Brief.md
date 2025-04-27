@@ -11,16 +11,16 @@ Build a tool that automatically captures and archives homepage snapshots and hea
   *"How did CNN vs. Fox cover the US tariff announcement on April 12th at noon?"*
 
 ## MVP Scope (Updated)
-- Focus on single-column grid view showing 5 major news sources at one point in time
-- Capture above-fold screenshots and headlines from Wayback Machine archives
-- Store in AWS S3 (screenshots) and MongoDB (metadata)
-- Features:
+- **5x5 grid**: 5 major news sources × 5 time slots (first column populated with real S3 images, others empty for now)
+- **Above-fold screenshots**: Captured from Wayback Machine or manual upload for MVP
+- **Backend/Frontend integration**: Real S3 images and metadata served via API and displayed in React grid
+- **Features:**
   - Thumbnail grid view with hover timestamp
   - Expandable detail view showing:
     - Full above-fold screenshot
-    - Prioritized headlines with editorial tags
+    - Prioritized headlines with editorial tags (placeholders for MVP)
     - Exact capture timestamp
-  - Group snapshots by target timestamp (e.g., 12:00 PM) while preserving actual capture times
+  - Group snapshots by target timestamp (e.g., 6:00 AM) while preserving actual capture times
 
 ## Suggested News Sites
 - CNN
@@ -29,18 +29,17 @@ Build a tool that automatically captures and archives homepage snapshots and hea
 - The Washington Post
 - USA Today
 
-## Wayback Machine Bootstrap Strategy
-Before building your live scraping system, bootstrap your dataset using historical snapshots from the Wayback Machine:
+## MVP Status
+- [x] S3 integration and manual upload of 5 images
+- [x] Backend API serving presigned URLs and metadata
+- [x] Frontend grid displays real S3 images in first column, empty columns for future slots
+- [x] End-to-end MVP demo complete
 
-- Query the CDX API for archived homepage timestamps across CNN, Fox, NYT, etc. (last 30 days)
-- Example: `https://web.archive.org/cdx/search/cdx?url=cnn.com&from=20240312&to=20240412&output=json&filter=statuscode:200&collapse=digest`
-- For each snapshot:
-  - Save the timestamped URL (e.g., `https://web.archive.org/web/20240411120301/http://cnn.com/`)
-  - Extract main headlines and editorial metadata
-  - Capture above-fold screenshot using Playwright
-  - Group snapshots by target timestamp while preserving actual capture time
-- Use a polite custom user-agent:  
-  `User-Agent: NewsLensBot/0.1 (+https://github.com/yourusername/newslens; contact: your@email.com)`
+## Next Steps
+- Add support for multiple time slots (automated or manual)
+- Integrate real headlines and editorial tags
+- Enhance error handling and loading states
+- Prepare for production deployment
 
 ## Future Enhancements (v1/v2)
 - Expand to multi-column time grid (e.g., 5x5 for time progression)
@@ -77,7 +76,7 @@ Before building your live scraping system, bootstrap your dataset using historic
    - Add timestamp grouping logic
 
 3. Frontend Implementation
-   - Simplify grid to single-column view
+   - Simplify grid to single-column view (done for MVP, now 5x5 grid with first column populated)
    - Create expandable detail view
    - Implement hover states and timestamp display
 

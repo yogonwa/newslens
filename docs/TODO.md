@@ -39,49 +39,32 @@ newslens/
 - [x] AWS S3 Setup (bucket, IAM, env)
 - [x] S3 service class implemented and tested
 - [x] Manual upload plan for 5 images for MVP prototyping
+- [x] MVP 5x5 grid: S3 images in first column, empty columns for future slots
+- [x] Frontend/backend integration for MVP grid
 
 ## Current Progress (MVP Phase)
 
 ### Infrastructure & Storage
 - [x] AWS S3 Setup
-  - [x] Create S3 bucket for screenshots
-  - [x] Configure IAM roles and permissions
-  - [x] Set up environment variables
-  - [x] Create S3 service class
-  - [x] Implement upload/download utilities
-  - [x] Add thumbnail generation (optional for prototype)
+- [x] S3 service class
+- [x] Manual upload for MVP
 
-### Manual Data Upload for MVP
-- [ ] Upload 5 local images to S3 for MVP prototype
-- [ ] (Optional) Generate and upload thumbnails
-- [ ] Prepare simple metadata for each image (source, timestamp, S3 key)
+### MVP Grid Prototype
+- [x] 5x5 grid structure in frontend
+- [x] Real S3 images in first column (6 AM)
+- [x] Empty/grey columns for other time slots
+- [x] Backend API serving presigned URLs and metadata
+- [x] Frontend fetches and displays real data
 
-### Retrieval API & Frontend Integration
-- [ ] Build retrieval API endpoint (presigned URLs + metadata)
-- [ ] Connect frontend to API and display images
-- [ ] Visual prototype of MVP grid
-
-### MongoDB Schema Updates
-- [ ] Update schema for S3 references (after prototype)
-
-### Data Collection (Full Automation - Post-MVP)
-- [ ] Integrate automated scraping logic
-
-## Next Steps (Prioritized)
-
-1. **Manual Upload & Metadata**
-   - Upload 5 images to S3
-   - Prepare metadata for each image
-2. **Retrieval API**
-   - Build endpoint to serve presigned URLs and metadata
-3. **Frontend Integration**
-   - Connect FE to API, display images
-4. **(Post-prototype) Resume scraping automation**
+### Next Steps
+- [ ] Add support for multiple time slots (automated or manual)
+- [ ] Integrate real headlines and editorial tags
+- [ ] Enhance error handling and loading states
+- [ ] Prepare for production deployment
 
 ## Notes
-- Decoupling scraping logic from MVP prototype
-- Focus on rapid visual prototyping with real S3 images
-- S3 integration and service class complete
+- MVP grid is visually and functionally complete for demo
+- Ready for feedback and next feature iteration
 
 ## Future Enhancements (Post-MVP)
 - Expand to multi-column time grid (5x5)

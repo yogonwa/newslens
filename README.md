@@ -5,14 +5,14 @@ NewsLens is a comprehensive news analysis platform that captures and analyzes ne
 ## Features
 
 ### MVP (Current Focus)
-- **Visual News Comparison**: Single-column grid showing 5 major news sources at one point in time
+- **Visual News Comparison**: 5x5 grid showing 5 major news sources at one point in time (first column populated, others empty for now)
 - **Above-Fold Screenshots**: Captured from Wayback Machine archives or manual upload for MVP prototype
-- **Editorial Context**: Headlines and editorial tags for each snapshot
+- **Editorial Context**: Headlines and editorial tags for each snapshot (placeholders for MVP)
 - **Precise Timing**: Group snapshots by target time while preserving actual capture times
 - **Interactive UI**: Thumbnail grid with expandable detailed views
 
 ### Future Enhancements
-- Multi-column time progression view
+- Multi-column time progression view (fully populated)
 - Sentiment analysis and emotional intensity tracking
 - Topic clustering and theme analysis
 - AI-powered querying and insights
@@ -98,23 +98,20 @@ npm run dev
 - [x] AWS S3 integration (bucket, IAM, env)
 - [x] S3 service class implemented and tested
 - [x] Manual upload plan for 5 images for MVP prototyping
+- [x] MVP 5x5 grid: S3 images in first column, empty columns for future slots
+- [x] Frontend/backend integration for MVP grid
 
 ### In Progress
-- [x] S3 integration for screenshot storage (manual upload for MVP prototype)
-- [ ] Upload 5 local images to S3 for MVP prototype
-- [ ] Retrieval API for presigned URLs and metadata
-- [ ] Frontend integration with API and S3 images
-- [ ] Visual prototype of MVP grid
+- [ ] Add support for multiple time slots (automated or manual)
+- [ ] Integrate real headlines and editorial tags
+- [ ] Enhance error handling and loading states
+- [ ] Prepare for production deployment
 
-### Next Steps
-1. Manual Upload & Metadata
-   - Upload 5 images to S3
-   - Prepare metadata for each image
-2. Retrieval API
-   - Build endpoint to serve presigned URLs and metadata
-3. Frontend Integration
-   - Connect FE to API, display images
-4. (Post-prototype) Resume scraping automation
+## Next Steps
+1. Add support for multiple time slots
+2. Integrate real headlines and editorial tags
+3. Enhance error handling and loading states
+4. Prepare for production deployment
 
 ## Contributing
 
