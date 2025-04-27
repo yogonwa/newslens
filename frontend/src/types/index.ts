@@ -68,6 +68,8 @@ export interface NewsSource {
   url: string;
   active: boolean;
   metadata: SourceMetadata;
+  color?: string;
+  logoUrl?: string;
 }
 
 export interface NewsSnapshot {

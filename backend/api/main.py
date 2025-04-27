@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import yaml
 import os
 from pathlib import Path
+from backend.api.routes import health
+from backend.api.routes import snapshots
 
 # Load configuration
 config_path = Path(__file__).parent.parent / "config" / "development.yaml"
@@ -25,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(health.router)
+app.include_router(snapshots.router)
 
 @app.get("/")
 async def root():
