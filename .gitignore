@@ -15,6 +15,7 @@ wayback_snapshots_*.json
 .vscode/
 .idea/
 node_modules/
+.cursor
 
 # Ignore all PNG images in backend/tests
 backend/tests/*.png
