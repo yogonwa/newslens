@@ -6,7 +6,7 @@ NewsLens is a comprehensive news analysis platform that captures and analyzes ne
 
 ### MVP (Current Focus)
 - **Visual News Comparison**: Single-column grid showing 5 major news sources at one point in time
-- **Above-Fold Screenshots**: Captured from Wayback Machine archives
+- **Above-Fold Screenshots**: Captured from Wayback Machine archives or manual upload for MVP prototype
 - **Editorial Context**: Headlines and editorial tags for each snapshot
 - **Precise Timing**: Group snapshots by target time while preserving actual capture times
 - **Interactive UI**: Thumbnail grid with expandable detailed views
@@ -95,34 +95,26 @@ npm run dev
 - [x] MongoDB Atlas setup
 - [x] Basic wayback scraping functionality
 - [x] Frontend component prototypes
+- [x] AWS S3 integration (bucket, IAM, env)
+- [x] S3 service class implemented and tested
+- [x] Manual upload plan for 5 images for MVP prototyping
 
 ### In Progress
-- [ ] S3 integration for screenshot storage
-- [ ] Above-fold screenshot capture
-- [ ] Headline extraction improvements
-- [ ] Single-column grid view
-- [ ] Detail view implementation
+- [x] S3 integration for screenshot storage (manual upload for MVP prototype)
+- [ ] Upload 5 local images to S3 for MVP prototype
+- [ ] Retrieval API for presigned URLs and metadata
+- [ ] Frontend integration with API and S3 images
+- [ ] Visual prototype of MVP grid
 
 ### Next Steps
-1. Infrastructure Setup
-   - Configure AWS S3
-   - Update MongoDB schema
-   - Create S3 service
-
-2. Data Collection
-   - Update wayback scraper
-   - Implement metadata extraction
-   - Add timestamp grouping
-
-3. Frontend Implementation
-   - Simplify grid view
-   - Create detail view
-   - Add hover states
-
-4. Integration & Deployment
-   - Connect all components
-   - Test workflow
-   - Deploy MVP
+1. Manual Upload & Metadata
+   - Upload 5 images to S3
+   - Prepare metadata for each image
+2. Retrieval API
+   - Build endpoint to serve presigned URLs and metadata
+3. Frontend Integration
+   - Connect FE to API, display images
+4. (Post-prototype) Resume scraping automation
 
 ## Contributing
 

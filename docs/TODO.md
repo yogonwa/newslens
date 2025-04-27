@@ -36,89 +36,52 @@ newslens/
 - [x] Frontend component prototypes
 - [x] Initial headline extraction implementation
 - [x] Documentation updates for MVP focus
+- [x] AWS S3 Setup (bucket, IAM, env)
+- [x] S3 service class implemented and tested
+- [x] Manual upload plan for 5 images for MVP prototyping
 
 ## Current Progress (MVP Phase)
 
 ### Infrastructure & Storage
-- [ ] AWS S3 Setup
-  - [ ] Create S3 bucket for screenshots
-  - [ ] Configure IAM roles and permissions
-  - [ ] Set up environment variables
-  - [ ] Create S3 service class
-  - [ ] Implement upload/download utilities
-  - [ ] Add thumbnail generation
+- [x] AWS S3 Setup
+  - [x] Create S3 bucket for screenshots
+  - [x] Configure IAM roles and permissions
+  - [x] Set up environment variables
+  - [x] Create S3 service class
+  - [x] Implement upload/download utilities
+  - [x] Add thumbnail generation (optional for prototype)
+
+### Manual Data Upload for MVP
+- [ ] Upload 5 local images to S3 for MVP prototype
+- [ ] (Optional) Generate and upload thumbnails
+- [ ] Prepare simple metadata for each image (source, timestamp, S3 key)
+
+### Retrieval API & Frontend Integration
+- [ ] Build retrieval API endpoint (presigned URLs + metadata)
+- [ ] Connect frontend to API and display images
+- [ ] Visual prototype of MVP grid
 
 ### MongoDB Schema Updates
-- [ ] Update schema for MVP focus
-  - [ ] Revise snapshot model for S3 integration
-  - [ ] Add timestamp grouping support
-  - [ ] Update source configuration model
-  - [ ] Add indexes for efficient querying
-  - [ ] Implement data validation
+- [ ] Update schema for S3 references (after prototype)
 
-### Data Collection
-- [ ] Wayback Scraper Improvements
-  - [ ] Modify for above-fold capture only
-  - [ ] Add screenshot cropping/resizing
-  - [ ] Enhance headline extraction
-  - [ ] Implement editorial tag detection
-  - [ ] Improve timestamp grouping logic
-  - [ ] Add S3 upload integration
-
-### Frontend MVP Components
-- [ ] Grid View Simplification
-  - [ ] Reduce to single column
-  - [ ] Add hover states with timestamps
-  - [ ] Implement loading states
-  - [ ] Add error handling
-  - [ ] Create placeholder components
-
-- [ ] Detail View Implementation
-  - [ ] Create expandable view component
-  - [ ] Add headline list display
-  - [ ] Show editorial context
-  - [ ] Implement image loading states
-  - [ ] Add error boundaries
-
-### API Development
-- [ ] Core Endpoints
-  - [ ] Snapshot retrieval by timestamp
-  - [ ] S3 presigned URL generation
-  - [ ] Source configuration endpoint
-  - [ ] Health check implementation
-  - [ ] Basic error handling
-  - [ ] Simple caching layer
-
-### Testing & Quality
-- [ ] Test Implementation
-  - [ ] S3 service unit tests
-  - [ ] API integration tests
-  - [ ] Frontend component tests
-  - [ ] Screenshot processing tests
-  - [ ] Error handling tests
+### Data Collection (Full Automation - Post-MVP)
+- [ ] Integrate automated scraping logic
 
 ## Next Steps (Prioritized)
 
-1. **Storage Infrastructure** (Foundation)
-   - Set up AWS S3 bucket and permissions
-   - Create S3 service for managing screenshots
-   - Update MongoDB schema for S3 references
-   - Implement thumbnail generation
-   - Configure AWS credentials
+1. **Manual Upload & Metadata**
+   - Upload 5 images to S3
+   - Prepare metadata for each image
+2. **Retrieval API**
+   - Build endpoint to serve presigned URLs and metadata
+3. **Frontend Integration**
+   - Connect FE to API, display images
+4. **(Post-prototype) Resume scraping automation**
 
-2. **Data Collection** (Content)
-   - Update wayback scraper for above-fold capture
-   - Implement screenshot processing
-   - Enhance headline extraction
-   - Add S3 upload integration
-   - Test with multiple sources
-
-3. **API & Frontend** (Display)
-   - Create core API endpoints
-   - Update frontend for real data
-   - Implement simplified grid
-   - Add detail view
-   - Test end-to-end flow
+## Notes
+- Decoupling scraping logic from MVP prototype
+- Focus on rapid visual prototyping with real S3 images
+- S3 integration and service class complete
 
 ## Future Enhancements (Post-MVP)
 - Expand to multi-column time grid (5x5)
