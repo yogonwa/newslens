@@ -12,8 +12,8 @@ Build a tool that automatically captures and archives homepage snapshots and hea
 ## MVP Scope (Updated)
 - **5x5 grid**: 5 major news sources × 5 fixed time slots per day (6am, 9am, 12pm, 3pm, 6pm)
   - Grid is day-based: each row is a source, each column is a time slot for that day
-  - First column (6am) currently populated with real S3 images and headlines; others to follow
-- **Above-fold screenshots**: Captured from Wayback Machine or manual upload for MVP
+  - All 5x5 cells for a single day (2025-04-18) are now populated with real S3 images and headlines
+- **Above-fold screenshots**: Captured from Wayback Machine, with plan to crop top whitespace/banners for better UX (crop values may vary by source)
 - **Backend/Frontend integration**: Real S3 images and metadata served via API and displayed in React grid
 - **Features:**
   - Thumbnail grid view with hover timestamp
@@ -22,9 +22,9 @@ Build a tool that automatically captures and archives homepage snapshots and hea
     - Prioritized headlines with editorial tags (optional, per source)
     - Exact capture timestamp
   - Group snapshots by target timestamp (e.g., 6:00 AM) while preserving actual capture times
-  - **Frontend additions:**
+  - **Frontend additions (Next):**
+    - Date navigation (move between days)
     - Filters for source, time slot, and editorial tag
-    - Date range navigation (move between days)
     - Snap to current day/time on page load
 
 ## Suggested News Sites
@@ -35,27 +35,23 @@ Build a tool that automatically captures and archives homepage snapshots and hea
 - USA Today
 
 ## MVP Status
-- [x] S3 integration and manual upload of 5 images (6am slot)
+- [x] S3 integration and automated upload for all 5x5 cells for a single day
 - [x] Backend API serving presigned URLs and metadata
-- [x] Frontend grid displays real S3 images in first column, empty columns for future slots
-- [x] End-to-end MVP demo complete for 6am slot
-- [x] Expandable detail view and headline display for 6am slot
-- [x] Redundant seed scripts and test data removed
-- [ ] Multi-slot support (grid is 5x5, but only 6am slot has real data)
-- [ ] Real editorial tags and headline metadata (placeholders only)
-- [ ] Enhanced error handling/loading states
+- [x] Frontend grid displays real S3 images for all slots for a single day
+- [x] End-to-end MVP demo complete for 5x5 grid
+- [x] Expandable detail view and headline display for all slots
+- [x] Robust error handling and retry logic in scraping
+- [ ] Date navigation and filtering (in progress)
+- [ ] Per-source screenshot cropping (planned)
 - [ ] Production deployment readiness
-- [ ] Frontend filters, date navigation, and snap-to-current
 
 ## Next Steps
-- Add support for multiple time slots (automated or manual)
-- Integrate real headlines and editorial tags
+- Add support for date navigation and filtering in frontend and backend
+- Implement per-source screenshot cropping to remove top whitespace/banners (crop values may vary by source)
 - Enhance error handling and loading states
-- Add frontend filters, date navigation, and snap-to-current
 - Prepare for production deployment
 
 ## Future Enhancements (v1/v2)
-- Expand to multi-column time grid (e.g., 5x5 for time progression)
 - Sentiment & sensationalism scoring on headlines
 - Visual heatmap overlays for emotional intensity
 - Word clouds and n-gram language analysis
@@ -89,7 +85,7 @@ Build a tool that automatically captures and archives homepage snapshots and hea
    - Build historical data capture script for 1/1/2025 to present (all slots)
 3. Frontend Implementation
    - 5x5 grid with real data for all slots
-   - Filters, date navigation, and snap-to-current
+   - Date navigation and filtering (in progress)
    - Expandable detail view
    - Implement hover states and timestamp display
 4. Integration
@@ -105,15 +101,6 @@ This document is for developers, contributors, and automation agents (e.g., Chat
 **Goal:**
 Automate the full pipeline for a single day, all 5 fixed time slots (6am, 9am, 12pm, 3pm, 6pm), for all 5 sources—using real Wayback data, publishing to S3 and MongoDB, and rendering in the frontend grid (no filters or navigation yet).
 
-**Why:**
-- Exercises the entire data pipeline (Wayback → S3/MongoDB → API → FE) for all grid cells for a single day.
-- Surfaces edge cases (missing snapshots, time rounding, S3/Mongo errors) in a controlled scope.
-- Provides a visually complete MVP grid for a single day, which is a powerful demo and a solid foundation for further automation.
-- Keeps frontend changes minimal (just render the full 5x5 grid for a hardcoded day).
-
-**Steps:**
-1. Backend: Build a script to fetch Wayback snapshots for all 5 sources at all 5 fixed times for a single day (e.g., 2025-04-18), extract headlines/editorial tags, upload screenshots to S3, and save metadata to MongoDB. Ensure idempotency and logging.
-2. Frontend: Update the grid to render all 5x5 cells for the chosen day, using real backend data. No filters, navigation, or date pickers yet—just a hardcoded day.
-3. Integration: Confirm all cells populate as expected. Document any issues (e.g., missing data, API shape needs).
-
-This milestone validates the architecture and sets up the next phase: historical backfill, date navigation, and go-forward scraping.
+**Status:**
+- [x] Complete and demoed for 2025-04-18
+- [ ] Ready for date navigation and UX improvements

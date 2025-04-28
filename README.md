@@ -5,18 +5,17 @@ NewsLens is a comprehensive news analysis platform that captures and analyzes ne
 ## Features
 
 ### MVP (Current Focus)
-- **Visual News Comparison**: 5x5 grid showing 5 major news sources at one point in time (first column populated, others empty for now)
-- **Above-Fold Screenshots**: Captured from Wayback Machine archives or manual upload for MVP prototype
+- **Visual News Comparison**: 5x5 grid showing 5 major news sources at 5 fixed times for a single day (all cells now populated for 2025-04-18)
+- **Above-Fold Screenshots**: Captured from Wayback Machine archives, with plan to crop top whitespace/banners for better UX (crop values may vary by source)
 - **Editorial Context**: Headlines and editorial tags for each snapshot (optional, per source; placeholders for MVP)
 - **Precise Timing**: Group snapshots by target time while preserving actual capture times
 - **Interactive UI**: Thumbnail grid with expandable detailed views
-- **Frontend Additions (Planned)**:
+- **Frontend Additions (Planned/Next):**
+  - Date navigation (move between days)
   - Filters for source, time slot, and editorial tag
-  - Date range navigation (move between days)
   - Snap to current day/time on page load
 
 ### Future Enhancements
-- Multi-column time progression view (fully populated)
 - Sentiment analysis and emotional intensity tracking
 - Topic clustering and theme analysis
 - AI-powered querying and insights
@@ -95,34 +94,20 @@ npm run dev
 ## Development Status
 
 ### Completed
-- [x] Project structure and organization
-- [x] MongoDB Atlas setup
-- [x] Basic wayback scraping functionality
-- [x] Frontend component prototypes
-- [x] AWS S3 integration (bucket, IAM, env)
-- [x] S3 service class implemented and tested
-- [x] Manual upload plan for 5 images for MVP prototyping
-- [x] MVP 5x5 grid: S3 images in first column, empty columns for future slots
-- [x] Frontend/backend integration for MVP grid
-- [x] Redundant seed scripts and test data removed
+- [x] Automated 5x5 grid scraping for a single day (2025-04-18) for all 5 sources and 5 time slots
+- [x] Robust error handling, retry logic, and logging for scraping pipeline
+- [x] S3 and MongoDB integration for screenshots and metadata
+- [x] End-to-end rendering in frontend grid
 
 ### In Progress
-- [ ] Add support for multiple time slots (automated or manual)
-- [ ] Integrate real headlines and editorial tags
-- [ ] Enhance error handling and loading states
-- [ ] Prepare for production deployment
-- [ ] Add frontend filters, date navigation, and snap-to-current
-- [ ] Build historical data capture script (Wayback, 1/1/2025 to present, all slots)
-- [ ] Add go-forward scraper tool (live or Wayback, all slots)
+- [ ] Date navigation and filtering in frontend and backend
+- [ ] Per-source screenshot cropping to remove top whitespace/banners (crop values may vary by source)
+- [ ] Documentation and developer onboarding notes
 
-## Next Steps
-1. Add support for multiple time slots (all 5 slots, all sources)
-2. Integrate real headlines and editorial tags (optional, per source)
-3. Enhance error handling and loading states
-4. Add frontend filters, date navigation, and snap-to-current
-5. Build historical data capture script for 1/1/2025 to present (Wayback, all slots)
-6. Add go-forward scraper tool for live or Wayback data
-7. Prepare for production deployment
+### Next Steps
+- Add support for date navigation and filtering in frontend and backend
+- Implement per-source screenshot cropping to remove top whitespace/banners
+- Prepare for production deployment
 
 ## Contributing
 
