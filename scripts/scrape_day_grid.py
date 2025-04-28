@@ -25,11 +25,79 @@ NEWS_SOURCES = [
     {"name": "USA Today", "url": "https://www.usatoday.com", "key": "usatoday.com"},
 ]
 
+# Vertical crop dimensions for each source (pixels from top to remove)
+SOURCE_CROPS = {
+    'cnn': 550,
+    'fox': 936,
+    'nytimes': 640,
+    'usatoday': 730,
+    'wapo': 725
+}
+
 WAYBACK_CDX_API = "https://web.archive.org/cdx/search/cdx"
 WAYBACK_BASE = "https://web.archive.org/web/"
 USER_AGENT = "NewsLensBot/0.1 (+https://github.com/yourusername/newslens)"
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def take_screenshot(wayback_url: str, site_key: str, timestamp: str) -> (str, int, dict):
+    # Get crop value for the source, defaulting to 0 if not specified
+    source_name = site_key.replace('.com', '')
+    crop_top = SOURCE_CROPS.get(source_name, 0)
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, args=[
+                '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-sandbox'])
+            context = browser.new_context(viewport={'width': 1920, 'height': 1080}, device_scale_factor=2.0)
+            page = context.new_page()
+            try:
+                page.set_default_navigation_timeout(120000)
+                page.set_default_timeout(120000)
+                try:
+                    page.goto(wayback_url, wait_until='domcontentloaded')
+                except Exception as e:
+                    logging.warning(f"[Attempt {attempt+1}] Navigation error for {wayback_url}: {e}")
+                    if attempt < max_retries - 1:
+                        sleep(2)
+                        continue
+                    else:
+                        raise
+                try:
+                    page.wait_for_selector('body', timeout=30000)
+                except Exception as e:
+                    logging.warning(f"Timeout waiting for body element: {str(e)}")
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                    try:
+                        # Scroll down by crop_top pixels
+                        if crop_top > 0:
+                            page.evaluate(f"window.scrollTo(0, {crop_top})")
+                            # Small wait to ensure the scroll completes
+                            page.wait_for_timeout(100)
+                        
+                        # Take full viewport screenshot from scrolled position
+                        page.screenshot(
+                            path=tmp.name,
+                            full_page=False  # Only capture viewport
+                        )
+                        size = os.path.getsize(tmp.name)
+                        return tmp.name, size, {
+                            "width": 1920,
+                            "height": 1080,
+                            "crop_top": crop_top
+                        }
+                    except Exception as e:
+                        logging.warning(f"[Attempt {attempt+1}] Screenshot error for {wayback_url}: {e}")
+                        if attempt < max_retries - 1:
+                            sleep(2)
+                            continue
+                        else:
+                            raise
+            finally:
+                context.close()
+                browser.close()
+    return None, 0, {}
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Scrape 5x5 news grid for a given day and times.")
@@ -65,47 +133,6 @@ def query_wayback_cdx(site: str, target_dt: datetime) -> dict:
     except Exception as e:
         logging.error(f"Wayback CDX error for {site} at {target_dt}: {e}")
         return None
-
-def take_screenshot(wayback_url: str, site_key: str, timestamp: str) -> (str, int, dict):
-    max_retries = 3
-    for attempt in range(max_retries):
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True, args=[
-                '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-sandbox'])
-            context = browser.new_context(viewport={'width': 1920, 'height': 1080}, device_scale_factor=2.0)
-            page = context.new_page()
-            try:
-                page.set_default_navigation_timeout(120000)
-                page.set_default_timeout(120000)
-                try:
-                    page.goto(wayback_url, wait_until='domcontentloaded')
-                except Exception as e:
-                    logging.warning(f"[Attempt {attempt+1}] Navigation error for {wayback_url}: {e}")
-                    if attempt < max_retries - 1:
-                        sleep(2)
-                        continue
-                    else:
-                        raise
-                try:
-                    page.wait_for_selector('body', timeout=30000)
-                except Exception as e:
-                    logging.warning(f"Timeout waiting for body element: {str(e)}")
-                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                    try:
-                        page.screenshot(path=tmp.name, full_page=False, clip={'x': 0, 'y': 0, 'width': 1920, 'height': 1080})
-                        size = os.path.getsize(tmp.name)
-                        return tmp.name, size, {"width": 1920, "height": 1080}
-                    except Exception as e:
-                        logging.warning(f"[Attempt {attempt+1}] Screenshot error for {wayback_url}: {e}")
-                        if attempt < max_retries - 1:
-                            sleep(2)
-                            continue
-                        else:
-                            raise
-            finally:
-                context.close()
-                browser.close()
-    return None, 0, {}
 
 def extract_headlines(wayback_url: str, site_key: str) -> List[dict]:
     headers = {"User-Agent": USER_AGENT}
