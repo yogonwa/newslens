@@ -5,10 +5,12 @@
 - Robust error handling, retry logic, and logging for scraping pipeline
 - S3 and MongoDB integration for screenshots and metadata
 - Confirmed end-to-end rendering in frontend grid
+- Improved screenshot cropping with source-specific crop values and proper viewport handling
 
 ## Current MVP Focus
 - 5x5 grid for a single day, fully automated and rendered in the frontend
 - All data flows: Wayback → S3/MongoDB → API → FE
+- Refetch screenshots with improved cropping for better visual consistency
 
 ## Project Structure
 ```
@@ -44,16 +46,17 @@ newslens/
 - [x] 5x5 grid scraping for a single day (2025-04-18)
 - [x] Frontend/backend integration for MVP grid
 - [x] Robust error handling and retry logic in scraping
+- [x] Screenshot cropping implementation with proper viewport handling
 
 ## In Progress / Next Steps
+- [ ] **Screenshot Reprocessing**
+  - Refetch and reprocess screenshots with new cropping logic
+  - Verify visual consistency across all sources
+  - Document final crop values for each source
 - [ ] **Date Navigation & Filtering**
   - Add date picker to frontend
   - Update API to accept date parameter and filter results
   - Allow user to view any day's 5x5 grid
-- [ ] **Screenshot Cropping UX Improvement**
-  - Crop top whitespace/banners from above-the-fold screenshots
-  - Crop values may vary by source; needs tuning and testing
-  - Parameterize crop per source in scraping script
 - [ ] **Documentation**
   - Document scraping script usage, error recovery, and reprocessing
   - Add developer notes for onboarding and next steps
@@ -64,6 +67,50 @@ newslens/
 - Go-forward and historical backfill automation
 - Enhanced error monitoring and dashboards
 - Topic clustering, word clouds, and AI-powered querying
+
+## Optimization Improvements
+
+### Security
+- Implement API key authentication with rate limiting
+- Add SSL/TLS for MongoDB connections
+- Secure database credentials with proper encryption
+- Add input validation and sanitization
+
+### Scalability
+- Implement Redis caching layer for frequently accessed data
+- Optimize database queries with proper indexing and projections
+- Add database connection pooling
+- Implement batch processing for large datasets
+
+### Performance
+- Add response compression (GZip)
+- Implement database query optimization
+- Add connection pooling for MongoDB
+- Optimize image loading and caching strategies
+
+### Monitoring & Logging
+- Add Prometheus metrics for API and database monitoring
+- Implement structured logging with proper log levels
+- Add request tracing and performance monitoring
+- Set up error tracking and alerting
+
+### Code Quality
+- Improve error handling with custom exception classes
+- Add comprehensive API documentation with OpenAPI
+- Implement better type checking and validation
+- Add more detailed code documentation
+
+### Testing
+- Add comprehensive unit tests for all components
+- Implement integration tests for API endpoints
+- Add performance testing for database operations
+- Set up continuous integration pipeline
+
+### Configuration
+- Implement environment-based configuration management
+- Add proper secrets management
+- Set up configuration validation
+- Add deployment environment configurations
 
 ## Audience
 This TODO is for developers, contributors, and automation agents (e.g., Chat cursor bot) to understand project status, priorities, and next steps. All implementation should align with the day-based, multi-slot news comparison vision.
