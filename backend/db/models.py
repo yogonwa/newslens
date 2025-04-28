@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field, ConfigDict
 from bson import ObjectId
 
-class HeadlineMetadata(BaseModel):
+class HeadlineMeta(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     font_size: Optional[str] = None
     color: Optional[str] = None
@@ -18,7 +18,7 @@ class Headline(BaseModel):
     type: str
     position: int
     sentiment: Optional[float] = None
-    metadata: Optional[HeadlineMetadata] = None
+    metadata: Optional[HeadlineMeta] = None
 
 class Screenshot(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -28,7 +28,7 @@ class Screenshot(BaseModel):
     dimensions: Dict[str, int]
     wayback_url: Optional[str] = None
 
-class HeadlineMetadata(BaseModel):
+class DocumentHeadlineMetadata(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     page_title: str
     url: str
@@ -48,7 +48,7 @@ class HeadlineDocument(BaseModel):
     actual_timestamp: datetime
     headlines: List[Headline]
     screenshot: Screenshot
-    metadata: HeadlineMetadata
+    metadata: DocumentHeadlineMetadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
