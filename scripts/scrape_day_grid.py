@@ -50,7 +50,8 @@ def take_screenshot(wayback_url: str, site_key: str, timestamp: str) -> (str, in
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, args=[
                 '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-sandbox'])
-            context = browser.new_context(viewport={'width': 1920, 'height': 1080}, device_scale_factor=2.0)
+            # Set viewport height larger to accommodate the full content before cropping
+            context = browser.new_context(viewport={'width': 1920, 'height': 2000}, device_scale_factor=2.0)
             page = context.new_page()
             try:
                 page.set_default_navigation_timeout(120000)
@@ -70,16 +71,15 @@ def take_screenshot(wayback_url: str, site_key: str, timestamp: str) -> (str, in
                     logging.warning(f"Timeout waiting for body element: {str(e)}")
                 with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
                     try:
-                        # Scroll down by crop_top pixels
-                        if crop_top > 0:
-                            page.evaluate(f"window.scrollTo(0, {crop_top})")
-                            # Small wait to ensure the scroll completes
-                            page.wait_for_timeout(100)
-                        
-                        # Take full viewport screenshot from scrolled position
+                        # Take screenshot with clip option to crop from top
                         page.screenshot(
                             path=tmp.name,
-                            full_page=False  # Only capture viewport
+                            clip={
+                                'x': 0,
+                                'y': crop_top,
+                                'width': 1920,
+                                'height': 1080
+                            }
                         )
                         size = os.path.getsize(tmp.name)
                         return tmp.name, size, {
@@ -121,7 +121,7 @@ def query_wayback_cdx(site: str, target_dt: datetime) -> dict:
     }
     headers = {"User-Agent": USER_AGENT}
     try:
-        resp = requests.get(WAYBACK_CDX_API, params=params, headers=headers, timeout=30)
+        resp = requests.get(WAYBACK_CDX_API, params=params, headers=headers, timeout=60)
         resp.raise_for_status()
         data = resp.json()
         if len(data) <= 1:
