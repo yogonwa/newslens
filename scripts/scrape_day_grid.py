@@ -18,8 +18,8 @@ from time import sleep
 
 # News sources and their canonical names
 NEWS_SOURCES = [
-    # {"name": "CNN", "url": "https://www.cnn.com", "key": "cnn.com"},
-    # {"name": "Fox News", "url": "https://www.foxnews.com", "key": "foxnews.com"},
+    {"name": "CNN", "url": "https://www.cnn.com", "key": "cnn.com"},
+    {"name": "Fox News", "url": "https://www.foxnews.com", "key": "foxnews.com"},
     {"name": "The New York Times", "url": "https://www.nytimes.com", "key": "nytimes.com"},
     {"name": "The Washington Post", "url": "https://www.washingtonpost.com", "key": "washingtonpost.com"},
     {"name": "USA Today", "url": "https://www.usatoday.com", "key": "usatoday.com"},
