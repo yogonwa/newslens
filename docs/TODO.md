@@ -6,6 +6,26 @@
 - S3 and MongoDB integration for screenshots and metadata
 - Confirmed end-to-end rendering in frontend grid
 - Improved screenshot cropping with source-specific crop values and proper viewport handling
+- Refetched majority of April 18th screenshots with updated crop values
+
+## Remaining Screenshot Refetch Tasks (April 18th)
+### Failed Slots to Retry:
+1. New York Times:
+   - 18:00 (failed due to Wayback timeout)
+2. USA Today:
+   - 09:00 (connection refused)
+   - 12:00 (connection refused)
+   - 18:00 (connection refused)
+
+### Command to Retry Failed Slots:
+```bash
+PYTHONPATH=/Users/joegonwa/Projects/newslens python scripts/scrape_day_grid.py --date 2025-04-18 --times 18:00 09:00 12:00 --overwrite
+```
+
+Note: USA Today slots are showing persistent connection refused errors with Wayback Machine. May need to:
+- Try at a different time when Wayback service is less loaded
+- Implement longer timeout values
+- Consider alternative Wayback Machine endpoints
 
 ## Current MVP Focus
 - 5x5 grid for a single day, fully automated and rendered in the frontend
