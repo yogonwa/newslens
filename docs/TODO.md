@@ -6,7 +6,8 @@
 - S3 and MongoDB integration for screenshots and metadata
 - Confirmed end-to-end rendering in frontend grid
 - Improved screenshot cropping with source-specific crop values and proper viewport handling
-- Refetched majority of April 18th screenshots with updated crop values
+- Successfully refetched all failed slots from April 18th
+- Identified and fixed screenshot cropping logic (changed from scroll-based to proper clip-based cropping)
 
 ## Remaining Screenshot Refetch Tasks (April 18th)
 ### Failed Slots to Retry:
@@ -155,4 +156,61 @@ Automate the full pipeline for a single day, all 5 fixed time slots (6am, 9am, 1
 2. Frontend: Update the grid to render all 5x5 cells for the chosen day, using real backend data. No filters, navigation, or date pickers yet—just a hardcoded day.
 3. Integration: Confirm all cells populate as expected. Document any issues (e.g., missing data, API shape needs).
 
-This milestone validates the architecture and sets up the next phase: historical backfill, date navigation, and go-forward scraping. 
+This milestone validates the architecture and sets up the next phase: historical backfill, date navigation, and go-forward scraping.
+
+## Current Focus: Screenshot Cropping Fix
+### Issue Identified
+- Current screenshots in S3 still show large banner spaces because the previous cropping method was incorrectly using scroll instead of actual image cropping
+
+### Next Steps
+1. **Verify Crop Values** (Optional)
+```python
+# Current crop values to verify:
+SOURCE_CROPS = {
+    'cnn': 550,
+    'fox': 936,
+    'nytimes': 640,
+    'usatoday': 730,
+    'wapo': 725
+}
+```
+
+2. **Refetch All Screenshots**
+```bash
+# Run from project root:
+PYTHONPATH=/Users/joegonwa/Projects/newslens python scripts/scrape_day_grid.py --date 2025-04-18 --times 06:00 09:00 12:00 15:00 18:00 --overwrite
+```
+
+3. **Verify Results**
+- Check frontend grid at http://localhost:5173
+- Confirm banner spaces are properly cropped for all sources
+- If any source's crop value needs adjustment, update SOURCE_CROPS and rerun for that source
+
+4. **If Needed: Source-Specific Refetch**
+To refetch specific sources, comment out others in NEWS_SOURCES and run the same command:
+```python
+# Example: Only fetch Fox News
+NEWS_SOURCES = [
+    # {"name": "CNN", "url": "https://www.cnn.com", "key": "cnn.com"},
+    {"name": "Fox News", "url": "https://www.foxnews.com", "key": "foxnews.com"},
+    # {"name": "The New York Times", "url": "https://www.nytimes.com", "key": "nytimes.com"},
+    # {"name": "The Washington Post", "url": "https://www.washingtonpost.com", "key": "washingtonpost.com"},
+    # {"name": "USA Today", "url": "https://www.usatoday.com", "key": "usatoday.com"},
+]
+```
+
+### Implementation Details
+The screenshot cropping has been updated to use Playwright's clip option instead of scrolling:
+```python
+page.screenshot(
+    path=tmp.name,
+    clip={
+        'x': 0,
+        'y': crop_top,
+        'width': 1920,
+        'height': 1080
+    }
+)
+```
+
+This ensures the top portion of each screenshot is actually removed rather than just scrolled out of view. 
