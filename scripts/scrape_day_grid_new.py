@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Dict, Tuple, Optional
 import requests
 from bs4 import BeautifulSoup
 from backend.scrapers.extractors.headline_extractors import get_extractor
@@ -15,6 +15,7 @@ from playwright.sync_api import sync_playwright
 import tempfile
 import json
 from time import sleep
+from PIL import Image
 
 # News sources and their canonical names
 NEWS_SOURCES = [
@@ -25,104 +26,153 @@ NEWS_SOURCES = [
     {"name": "USA Today", "url": "https://www.usatoday.com", "key": "usatoday.com"},
 ]
 
+# Vertical crop dimensions for each source (pixels from top to remove)
+SOURCE_CROPS = {
+    'cnn': 550,
+    'foxnews': 936,
+    'nytimes': 640,
+    'usatoday': 730,
+    'washingtonpost': 725
+}
+
 WAYBACK_CDX_API = "https://web.archive.org/cdx/search/cdx"
 WAYBACK_BASE = "https://web.archive.org/web/"
 USER_AGENT = "NewsLensBot/0.1 (+https://github.com/yourusername/newslens)"
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def take_screenshot(wayback_url: str, site_key: str, timestamp: str) -> (str, int, dict):
+def crop_above_the_fold(image_path: str, site_key: str) -> Tuple[str, dict]:
     """
-    Navigates to a Wayback Machine URL, removes unwanted header/banner elements,
-    and captures a clean full-page screenshot.
-
+    Crops a 1920x1080 region from a full screenshot, starting after the banner.
+    
     Args:
-        wayback_url (str): Full URL to the Wayback snapshot.
-        site_key (str): Identifier for the news source (e.g., cnn.com).
-        timestamp (str): Wayback timestamp string.
-
+        image_path (str): Path to full screenshot
+        site_key (str): News site key, like 'cnn.com'
+        
     Returns:
-        (screenshot_path, file_size, metadata_dict)
+        Tuple[str, dict]: (cropped_path, dimensions_dict)
+    """
+    source_name = site_key.split('.')[0]
+    crop_top = SOURCE_CROPS.get(source_name, 0)
+    
+    cropped_path = image_path.replace(".png", "_cropped.png")
+    
+    with Image.open(image_path) as img:
+        cropped = img.crop((0, crop_top, 1920, crop_top + 1080))
+        cropped.save(cropped_path)
+        
+        # Clean up original
+        os.unlink(image_path)
+        
+        return cropped_path, {
+            "width": 1920,
+            "height": 1080,
+            "crop_top": crop_top
+        }
+
+def take_screenshot(wayback_url: str, site_key: str, timestamp: str) -> Tuple[Optional[str], int, Dict]:
+    """
+    Captures a full screenshot and crops it to the main content area.
+    
+    Args:
+        wayback_url (str): Full URL to the Wayback snapshot
+        site_key (str): Identifier for the news source (e.g., cnn.com)
+        timestamp (str): Wayback timestamp string
+    
+    Returns:
+        Tuple[Optional[str], int, Dict]: (screenshot_path, file_size, dimensions)
     """
     max_retries = 3
+    screenshot_path = None
+    
     for attempt in range(max_retries):
-        with sync_playwright() as p:
+        p = None
+        browser = None
+        context = None
+        page = None
+        tmp = None
+        
+        try:
+            p = sync_playwright().start()
             browser = p.chromium.launch(headless=True, args=[
                 '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-sandbox'
             ])
-            context = browser.new_context(viewport={'width': 1920, 'height': 2000}, device_scale_factor=2.0)
+            context = browser.new_context(viewport={'width': 1920, 'height': 2000})
             page = context.new_page()
+            
+            page.set_default_navigation_timeout(120000)
+            page.set_default_timeout(120000)
+            
             try:
-                page.set_default_navigation_timeout(120000)
-                page.set_default_timeout(120000)
+                page.goto(wayback_url, wait_until='domcontentloaded')
+            except Exception as e:
+                logging.warning(f"[Attempt {attempt+1}] Navigation error for {wayback_url}: {e}")
+                if attempt < max_retries - 1:
+                    sleep(2)
+                    continue
+                raise
+
+            # Only remove Wayback toolbar
+            page.evaluate("""() => {
+                const waybackElements = ['#wm-ipp', '#wm-ipp-base', '#wm-ipp-print'];
+                waybackElements.forEach(sel => {
+                    const el = document.querySelector(sel);
+                    if (el) el.remove();
+                });
+            }""")
+
+            # Short wait for any layout shifts
+            sleep(1)
+            
+            # Take full page screenshot
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
                 try:
-                    page.goto(wayback_url, wait_until='domcontentloaded')
+                    page.screenshot(path=tmp.name, full_page=True)
+                    
+                    # Crop the screenshot
+                    screenshot_path, dimensions = crop_above_the_fold(tmp.name, site_key)
+                    
+                    size = os.path.getsize(screenshot_path)
+                    return screenshot_path, size, dimensions
+                    
                 except Exception as e:
-                    logging.warning(f"[Attempt {attempt+1}] Navigation error for {wayback_url}: {e}")
+                    if tmp and os.path.exists(tmp.name):
+                        os.unlink(tmp.name)
+                    logging.warning(f"[Attempt {attempt+1}] Screenshot error for {wayback_url}: {e}")
                     if attempt < max_retries - 1:
                         sleep(2)
                         continue
-                    else:
-                        raise
-
-                # Remove Wayback and site-specific headers
-                page.evaluate("""
-                    // Always remove Wayback toolbar
-                    const wm = document.getElementById('wm-ipp');
-                    if (wm) wm.remove();
-
-                    // Carefully target only clear ads
-                    const selectorsToRemove = [
-                        'iframe[src*="ads"]',
-                        'iframe[src*="doubleclick"]',
-                        'iframe[src*="googlesyndication"]',
-                        '.ad-banner',
-                        '.advertisement',
-                        '[aria-label="Advertisement"]',
-                        '[id^="ad-"]:not(#ad-container):not([id*="ad-container"])',
-                        '[class*="ad-"]:not([class*="ad-container"])'
-                    ];
-
-                    selectorsToRemove.forEach(sel => {
-                        document.querySelectorAll(sel).forEach(el => el.remove());
-                    });
-
-                    // Optional: Scroll to bottom to trigger lazy loads
-                    window.scrollTo(0, document.body.scrollHeight);
-                """)
-                
-                sleep(1)  # Allow DOM updates and lazy loads to settle
-
-                # Dynamically calculate full page height
-                full_height = page.evaluate("document.body.scrollHeight")
-
-                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-                    try:
-                        page.screenshot(
-                            path=tmp.name,
-                            clip={
-                                'x': 0,
-                                'y': 0,
-                                'width': 1920,
-                                'height': full_height
-                            }
-                        )
-                        size = os.path.getsize(tmp.name)
-                        return tmp.name, size, {
-                            "width": 1920,
-                            "height": full_height,
-                            "crop_top": 0  # No manual crop needed
-                        }
-                    except Exception as e:
-                        logging.warning(f"[Attempt {attempt+1}] Screenshot error for {wayback_url}: {e}")
-                        if attempt < max_retries - 1:
-                            sleep(2)
-                            continue
-                        else:
-                            raise
-            finally:
-                context.close()
-                browser.close()
+                    raise
+                    
+        except Exception as e:
+            logging.error(f"Error during screenshot capture: {str(e)}")
+            if screenshot_path and os.path.exists(screenshot_path):
+                os.unlink(screenshot_path)
+            if attempt == max_retries - 1:
+                raise
+        finally:
+            # Ensure browser resources are cleaned up
+            if page:
+                try:
+                    page.close()
+                except:
+                    pass
+            if context:
+                try:
+                    context.close()
+                except:
+                    pass
+            if browser:
+                try:
+                    browser.close()
+                except:
+                    pass
+            if p:
+                try:
+                    p.stop()
+                except:
+                    pass
+            
     return None, 0, {}
 
 def parse_args():

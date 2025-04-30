@@ -9,6 +9,7 @@ venv/
 
 # Project specific
 screenshots/
+downloaded_screenshots/
 wayback_snapshots_*.json
 
 # IDE
