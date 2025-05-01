@@ -11,6 +11,7 @@ venv/
 screenshots/
 downloaded_screenshots/
 wayback_snapshots_*.json
+temp/
 
 # IDE
 .vscode/
