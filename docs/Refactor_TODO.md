@@ -27,10 +27,10 @@
   - [x] Implement retry logic
   - [x] Add error boundaries
   - [x] Set up structured logging with proper context
-- [ ] Testing
-  - [ ] Write unit tests
-  - [ ] Test with known snapshots
-  - [ ] Add error case coverage
+- [x] Testing
+  - [x] Write unit tests
+  - [x] Test with known snapshots
+  - [x] Add error case coverage
 
 ## Phase 3: Screenshot Service (Days 3-4)
 - [x] Playwright Setup
