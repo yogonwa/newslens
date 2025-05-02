@@ -52,8 +52,26 @@ class Config:
     LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
     
     @classmethod
-    def load_env(cls, env_file: Path = None):
-        """Load environment variables from .env file"""
+    def load_env(cls, env_file: Path = None) -> Dict:
+        """Load environment variables and return config dictionary"""
         if env_file and env_file.exists():
             from dotenv import load_dotenv
-            load_dotenv(env_file) 
+            load_dotenv(env_file)
+            
+        return {
+            's3_bucket': cls.S3_BUCKET,
+            'mongo_uri': cls.MONGO_URI,
+            'mongo_db': cls.MONGO_DB,
+            'viewport': cls.VIEWPORT,
+            'default_times': cls.DEFAULT_TIMES,
+            'news_sources': cls.NEWS_SOURCES,
+            'wayback_cdx_api': cls.WAYBACK_CDX_API,
+            'wayback_base': cls.WAYBACK_BASE,
+            'user_agent': cls.USER_AGENT,
+            'wayback_cdx_params': cls.WAYBACK_CDX_PARAMS,
+            'max_retries': cls.MAX_RETRIES,
+            'retry_delay': cls.RETRY_DELAY,
+            'max_consecutive_errors': cls.MAX_CONSECUTIVE_ERRORS,
+            'log_level': cls.LOG_LEVEL,
+            'log_format': cls.LOG_FORMAT
+        } 

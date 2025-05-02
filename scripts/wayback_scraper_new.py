@@ -1,23 +1,99 @@
 from datetime import datetime, timedelta
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, List
 from PIL import Image
 from io import BytesIO
 import logging
 import asyncio
+from playwright.async_api import async_playwright
+from backend.services.s3_service import S3Service
+from backend.db.operations import db_ops
+from backend.db.models import HeadlineDocument, Screenshot, DocumentHeadlineMetadata, Headline
+from backend.scrapers.extractors.headline_extractors import get_extractor
+
+# Default configuration
+DEFAULT_CONFIG = {
+    'wayback_cdx_api': 'https://web.archive.org/cdx/search/cdx',
+    'wayback_base': 'https://web.archive.org/web/',
+    'user_agent': 'NewsLensBot/0.1',
+    'default_times': ['06:00', '09:00', '12:00', '15:00', '18:00'],
+    'news_sources': [
+        {"name": "CNN", "url": "https://www.cnn.com", "key": "cnn.com"},
+        {"name": "Fox News", "url": "https://www.foxnews.com", "key": "foxnews.com"},
+        {"name": "The New York Times", "url": "https://www.nytimes.com", "key": "nytimes.com"},
+        {"name": "The Washington Post", "url": "https://www.washingtonpost.com", "key": "washingtonpost.com"},
+        {"name": "USA Today", "url": "https://www.usatoday.com", "key": "usatoday.com"}
+    ]
+}
 
 class ScreenshotService:
-    """Handles Wayback Machine screenshot capture"""
-    def __init__(self, viewport_width=1920, viewport_height=2000, device_scale_factor=2.0):
-        self.viewport_config = {
-            "width": viewport_width,
-            "height": viewport_height,
-            "device_scale_factor": device_scale_factor
-        }
+    """Service for capturing screenshots using Playwright"""
     
-    async def capture_screenshot(self, wayback_url: str) -> BytesIO:
-        """Placeholder for screenshot capture logic"""
-        # TODO: Implement Playwright screenshot capture
-        pass
+    def __init__(self):
+        self.max_retries = 3
+        
+    async def capture_screenshot(self, url: str) -> Optional[BytesIO]:
+        """Capture a full page screenshot of the given URL"""
+        screenshot_buffer = None
+        
+        async with async_playwright() as p:
+            try:
+                # Launch browser with proper args
+                browser = await p.chromium.launch(
+                    headless=True,
+                    args=['--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-sandbox']
+                )
+                
+                # Create context with larger viewport
+                context = await browser.new_context(
+                    viewport={'width': 1920, 'height': 2000},
+                    device_scale_factor=2.0
+                )
+                
+                page = await context.new_page()
+                page.set_default_navigation_timeout(120000)  # 2 minutes
+                page.set_default_timeout(120000)
+                
+                # Navigate and wait for content
+                logging.info(f"Loading {url}")
+                await page.goto(url, wait_until='domcontentloaded')
+                await page.wait_for_selector('body', timeout=30000)
+                
+                # Remove Wayback toolbar
+                await page.evaluate("""() => {
+                    const waybackElements = ['#wm-ipp', '#wm-ipp-base', '#wm-ipp-print'];
+                    waybackElements.forEach(sel => {
+                        const el = document.querySelector(sel);
+                        if (el) el.remove();
+                    });
+                }""")
+                
+                # Short wait for any layout shifts
+                await asyncio.sleep(1)
+                
+                # Take full page screenshot
+                screenshot_buffer = BytesIO()
+                screenshot_bytes = await page.screenshot(full_page=True)
+                screenshot_buffer.write(screenshot_bytes)
+                screenshot_buffer.seek(0)
+                
+                await context.close()
+                await browser.close()
+                return screenshot_buffer
+                
+            except Exception as e:
+                logging.error(f"Error capturing screenshot for {url}: {e}")
+                if screenshot_buffer:
+                    screenshot_buffer.close()
+                return None
+                
+            finally:
+                try:
+                    await context.close()
+                    await browser.close()
+                except:
+                    pass
+                    
+        return None
 
 class NewsCropper:
     """Handles source-specific image cropping"""
@@ -150,13 +226,43 @@ class WaybackScraper:
         self.config = config
         self.screenshot_service = ScreenshotService()
         self.s3_service = S3Service(config['s3_bucket'])
-        self.db_service = DBService(config['mongo_uri'])
+        self.db_service = db_ops  # Use the singleton instance
         self.cropper = NewsCropper()
         self.error_count = 0
         self.max_consecutive_errors = 3
 
+    async def extract_headlines(self, wayback_url: str, source_key: str) -> List[Dict]:
+        """Extract headlines from webpage"""
+        import requests
+        from bs4 import BeautifulSoup
+        
+        try:
+            resp = await asyncio.to_thread(
+                requests.get,
+                wayback_url,
+                headers={"User-Agent": self.config['user_agent']},
+                timeout=30
+            )
+            resp.raise_for_status()
+            html = resp.text
+            
+            # Use existing extractor logic
+            extractor = get_extractor(source_key)
+            if not extractor:
+                logging.warning(f"No extractor for {source_key}")
+                return []
+                
+            soup = BeautifulSoup(html, 'html.parser')
+            return extractor.extract_headlines(soup, f"https://{source_key}")
+                
+        except Exception as e:
+            logging.error(f"Headline extraction error for {source_key}: {e}")
+            return []
+
     async def query_wayback_cdx(self, site: str, target_dt: datetime) -> Optional[Dict]:
         """Query Wayback CDX API for closest snapshot"""
+        import requests
+        
         params = {
             "url": site,
             "from": target_dt.strftime("%Y%m%d"),
@@ -165,12 +271,15 @@ class WaybackScraper:
             "filter": "statuscode:200",
             "collapse": "digest"
         }
+        headers = {"User-Agent": self.config['user_agent']}
         
         try:
-            resp = await self.config['session'].get(
+            resp = await asyncio.to_thread(
+                requests.get,
                 self.config['wayback_cdx_api'],
                 params=params,
-                headers={"User-Agent": self.config['user_agent']}
+                headers=headers,
+                timeout=60
             )
             resp.raise_for_status()
             data = resp.json()
@@ -193,6 +302,9 @@ class WaybackScraper:
 
     async def process_single_snapshot(self, source: Dict, target_dt: datetime) -> Optional[Dict]:
         """Process a single source at a specific time"""
+        screenshot_buffer = None
+        cropped_buffer = None
+        
         try:
             # 1. Query Wayback for snapshot
             cdx_data = await self.query_wayback_cdx(source['url'], target_dt)
@@ -213,44 +325,75 @@ class WaybackScraper:
             try:
                 cropped_buffer, crop_meta = self.cropper.crop_by_source(screenshot_buffer, source['key'])
             finally:
-                screenshot_buffer.close()
+                if screenshot_buffer:
+                    screenshot_buffer.close()
 
             # 4. Upload to S3
             s3_key = f"auto/{target_dt.date()}/{source['key']}_{target_dt.strftime('%H%M')}.png"
             try:
-                s3_url = await self.s3_service.upload_buffer(
-                    cropped_buffer,
+                s3_key = await asyncio.to_thread(
+                    self.s3_service.upload_bytes,
+                    cropped_buffer.getvalue(),
                     s3_key,
-                    metadata={
-                        'source': source['name'],
-                        'timestamp': target_dt.isoformat(),
-                        'wayback_url': wayback_url
-                    }
+                    content_type='image/png'
                 )
             finally:
-                cropped_buffer.close()
+                if cropped_buffer:
+                    cropped_buffer.close()
 
             # 5. Extract headlines
             headlines = await self.extract_headlines(wayback_url, source['key'])
 
             # 6. Save to database
-            source_id = await self.db_service.get_source_id(source['name'])
+            sources = await asyncio.to_thread(self.db_service.list_sources)
+            source_id = next((s['_id'] for s in sources if s['name'] == source['name']), None)
             if not source_id:
                 raise ValueError(f"Source not found: {source['name']}")
 
-            await self.db_service.save_snapshot(
+            # Create headline document
+            screenshot_obj = Screenshot(
+                url=s3_key,
+                format="png",
+                size=len(cropped_buffer.getvalue()) if cropped_buffer else 0,
+                dimensions=crop_meta['dimensions'],
+                wayback_url=wayback_url
+            )
+
+            meta = DocumentHeadlineMetadata(
+                page_title=source['name'],
+                url=wayback_url,
+                user_agent=self.config.get('user_agent', 'NewsLensBot/0.1'),
+                time_difference=int((actual_dt - target_dt).total_seconds()),
+                confidence="high",
+                collection_method="wayback",
+                status="success"
+            )
+
+            processed_headlines = []
+            for idx, h in enumerate(headlines):
+                processed_headlines.append(
+                    Headline(
+                        text=h.get('headline', ''),
+                        type='main' if idx == 0 else 'secondary',
+                        position=idx + 1,
+                        metadata=h.get('metadata')
+                    )
+                )
+
+            doc = HeadlineDocument(
                 source_id=source_id,
                 display_timestamp=target_dt,
                 actual_timestamp=actual_dt,
-                s3_url=s3_url,
-                wayback_url=wayback_url,
-                headlines=headlines,
-                image_meta=crop_meta
+                headlines=processed_headlines,
+                screenshot=screenshot_obj,
+                metadata=meta
             )
+
+            await asyncio.to_thread(self.db_service.add_headline, doc)
 
             # Reset error count on success
             self.error_count = 0
-            return {'s3_url': s3_url, 'meta': crop_meta}
+            return {'s3_url': s3_key, 'meta': crop_meta}
 
         except Exception as e:
             self.error_count += 1
@@ -287,8 +430,11 @@ class WaybackScraper:
 async def main():
     """CLI entry point"""
     import argparse
-    import aiohttp
-    from .config import Config
+    import os
+    from dotenv import load_dotenv
+
+    # Load environment variables
+    load_dotenv()
     
     parser = argparse.ArgumentParser(description="Wayback Machine News Scraper")
     parser.add_argument("--start-date", required=True, help="Start date (YYYY-MM-DD)")
@@ -296,20 +442,17 @@ async def main():
     parser.add_argument("--times", nargs="+", help="Optional time slots (HH:MM)")
     args = parser.parse_args()
 
-    # Load config
-    config = Config.load_env()
+    # Initialize config with defaults and environment variables
+    config = DEFAULT_CONFIG.copy()
+    config['s3_bucket'] = os.getenv('S3_BUCKET_NAME')
     
-    # Create aiohttp session
-    async with aiohttp.ClientSession() as session:
-        config['session'] = session
-        
-        # Initialize and run scraper
-        scraper = WaybackScraper(config)
-        await scraper.process_date_range(
-            args.start_date,
-            args.end_date,
-            args.times
-        )
+    # Initialize and run scraper
+    scraper = WaybackScraper(config)
+    await scraper.process_date_range(
+        args.start_date,
+        args.end_date,
+        args.times
+    )
 
 if __name__ == "__main__":
     asyncio.run(main()) 

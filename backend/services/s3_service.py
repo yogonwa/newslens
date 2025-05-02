@@ -32,13 +32,17 @@ class S3Service:
             self.logger.error(f"Failed to upload {file_path} to S3: {e}")
             raise
 
-    def upload_bytes(self, file_bytes: bytes, s3_key: str, content_type: str = 'application/octet-stream') -> str:
+    def upload_bytes(self, file_bytes: bytes, s3_key: str, content_type: str = 'application/octet-stream', metadata: dict = None) -> str:
         try:
+            extra_args = {'ContentType': content_type}
+            if metadata:
+                extra_args['Metadata'] = {k: str(v) for k, v in metadata.items()}
+                
             self.s3_client.put_object(
                 Bucket=self.bucket_name,
                 Key=s3_key,
                 Body=file_bytes,
-                ContentType=content_type
+                **extra_args
             )
             return s3_key
         except ClientError as e:
