@@ -9,9 +9,14 @@ async def test_capture_real_page():
         browser = await p.chromium.launch(headless=True)
         service = ScreenshotService()
         service.browser = browser
-        # Use a stable Wayback Machine archive URL for CNN
-        image_bytesio = await service.capture("https://web.archive.org/web/20240101000000/https://www.cnn.com/")
+        # Use the specified Wayback Machine archive URL for CNN
+        url = "https://web.archive.org/web/20250418051928/https://www.cnn.com/"
+        image_bytesio = await service.capture(url)
         assert image_bytesio is not None
+        # Save the screenshot for visual inspection
+        with open("test_fullsize_screenshot.png", "wb") as f:
+            f.write(image_bytesio.read())
+        image_bytesio.seek(0)  # Reset for any further use
         # Should be a BytesIO object with nonzero size
         assert hasattr(image_bytesio, 'read')
         data = image_bytesio.read()

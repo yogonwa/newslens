@@ -78,7 +78,7 @@
 - [x] Testing & Documentation
   - [x] Unit tests for base classes
   - [x] Integration tests per source
-  - [x] Visual validation tools (outputs saved to crop_outputs/)
+  - [x] Visual validation tools (outputs saved to crop_outputs/ and full-size screenshot saved as test_fullsize_screenshot.png)
   - [ ] Performance benchmarks
   - [ ] Update technical documentation
 
@@ -87,6 +87,9 @@
 - [ ] Implement visual validation UI
 - [ ] Add crop parameter tuning tools
 - [ ] Consider ML-based boundary detection
+
+### Phase 3.5 Next Steps
+- [ ] Document or automate regeneration of test images for croppers (backend/tests/images/)
 
 ## Phase 4: Storage Layer (Days 5-6)
 - [ ] MongoDB Implementation
@@ -168,5 +171,7 @@
 - [ ] Performance metrics met
 
 ### Next Steps
-- [ ] Add modular unit/integration tests for headline extraction service (CNN, Fox, NYT, WaPo, USA Today)
-- [ ] Debug and finish E2E pipeline integration test (ensure headline extraction works with Wayback HTML)
+- [x] Add modular unit/integration tests for headline extraction service (CNN, Fox, NYT, WaPo, USA Today)
+- [x] Finalize and expand end-to-end pipeline integration test (see test_e2e_pipeline.py; ensure full pipeline from Wayback to S3/DB works for all five sources)
+- [x] Save and visually inspect full-size screenshot from screenshot service integration test
+- [ ] Document or automate test image regeneration for croppers

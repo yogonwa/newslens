@@ -22,8 +22,20 @@ node_modules/
 
 # Ignore all PNG images in backend/tests
 backend/tests/*.png
-backend/tests/images/*.png
+
+# Ignore all files in backend/tests/images
+backend/tests/images/
 
 # Do not ignore scripts and metadata
 !backend/tests/snapshot_metadata.json
 !backend/tests/upload_images_and_generate_metadata.py
+
+# Add the HTML sample files in backend/tests/fixtures/ to .gitignore
+backend/tests/fixtures/cnn_sample.html
+backend/tests/fixtures/foxnews_sample.html
+backend/tests/fixtures/nytimes_sample.html
+backend/tests/fixtures/usatoday_sample.html
+backend/tests/fixtures/wapo_sample.html
+
+# Ignore test screenshots
+test_fullsize_screenshot.png
