@@ -75,10 +75,10 @@
   - [x] Region validation for multi-region
   - [x] Proper exception propagation
 
-- [ ] Testing & Documentation
-  - [ ] Unit tests for base classes
-  - [ ] Integration tests per source
-  - [ ] Visual validation tools
+- [x] Testing & Documentation
+  - [x] Unit tests for base classes
+  - [x] Integration tests per source
+  - [x] Visual validation tools (outputs saved to crop_outputs/)
   - [ ] Performance benchmarks
   - [ ] Update technical documentation
 
@@ -166,3 +166,7 @@
 - [ ] Documentation complete
 - [ ] Tests passing
 - [ ] Performance metrics met
+
+### Next Steps
+- [ ] Add modular unit/integration tests for headline extraction service (CNN, Fox, NYT, WaPo, USA Today)
+- [ ] Debug and finish E2E pipeline integration test (ensure headline extraction works with Wayback HTML)

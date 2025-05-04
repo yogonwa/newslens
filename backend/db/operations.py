@@ -3,28 +3,31 @@ from datetime import datetime
 from bson import ObjectId
 from pymongo.collection import Collection
 from .connection import db_connection
-from .config import COLLECTIONS, INDEXES
+from backend.config import get_config
 from .models import HeadlineDocument, SourceDocument
 
 class DatabaseOperations:
     def __init__(self):
         self.db = db_connection.db
+        self.config = get_config()
         self._setup_collections()
         self._create_indexes()
 
     def _setup_collections(self):
         """Initialize collections if they don't exist."""
-        self.sources: Collection = self.db[COLLECTIONS['sources']]
-        self.headlines: Collection = self.db[COLLECTIONS['headlines']]
+        collections = self.config.mongodb['collections']
+        self.sources: Collection = self.db[collections['sources']]
+        self.headlines: Collection = self.db[collections['headlines']]
 
     def _create_indexes(self):
         """Create indexes for collections."""
+        indexes = self.config.mongodb['indexes']
         # Create indexes for headlines collection
-        for index in INDEXES['headlines']:
+        for index in indexes['headlines']:
             self.headlines.create_index(index['keys'], name=index['name'])
 
         # Create indexes for sources collection
-        for index in INDEXES['sources']:
+        for index in indexes['sources']:
             self.sources.create_index(index['keys'], name=index['name'])
 
     # Source Operations

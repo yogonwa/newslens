@@ -1,3 +1,5 @@
+# (archived) This script is no longer used in the main pipeline, kept for reference.
+
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
@@ -39,7 +41,4 @@ def test_connection():
         client.close()
         
     except Exception as e:
-        print(f"Error connecting to MongoDB: {e}")
-
-if __name__ == "__main__":
-    test_connection() 
+        print(f"Error connecting to MongoDB: {e}") 

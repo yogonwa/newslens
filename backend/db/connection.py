@@ -1,7 +1,7 @@
 from typing import Optional
 from pymongo import MongoClient
 from pymongo.database import Database
-from .config import MONGO_CONFIG
+from backend.config import get_config
 
 class MongoDBConnection:
     _instance: Optional['MongoDBConnection'] = None
@@ -20,9 +20,10 @@ class MongoDBConnection:
     def _connect(self):
         """Establish connection to MongoDB."""
         try:
-            self._client = MongoClient(MONGO_CONFIG['uri'])
-            self._db = self._client[MONGO_CONFIG['database']]
-            print(f"Connected to MongoDB at {MONGO_CONFIG['uri']}")
+            config = get_config()
+            self._client = MongoClient(config.mongodb['uri'])
+            self._db = self._client[config.mongodb['database']]
+            print(f"Connected to MongoDB at {config.mongodb['uri']}")
         except Exception as e:
             print(f"Error connecting to MongoDB: {e}")
             raise

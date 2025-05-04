@@ -5,6 +5,7 @@ __pycache__/
 
 # Environment
 venv/
+.venv/
 .env
 
 # Project specific
@@ -21,6 +22,7 @@ node_modules/
 
 # Ignore all PNG images in backend/tests
 backend/tests/*.png
+backend/tests/images/*.png
 
 # Do not ignore scripts and metadata
 !backend/tests/snapshot_metadata.json

@@ -79,4 +79,17 @@ class S3Service:
             return files
         except ClientError as e:
             self.logger.error(f"Failed to list files with prefix '{prefix}': {e}")
+            raise
+
+    def delete_prefix(self, prefix: str) -> int:
+        """Delete all objects under a given prefix. Returns number of deleted objects."""
+        try:
+            files = self.list_files(prefix)
+            deleted = 0
+            for key in files:
+                self.delete_file(key)
+                deleted += 1
+            return deleted
+        except ClientError as e:
+            self.logger.error(f"Failed to delete files with prefix '{prefix}': {e}")
             raise 

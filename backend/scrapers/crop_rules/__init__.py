@@ -41,11 +41,13 @@ class CropMetadata:
         source_key: Identifier for the news source
         regions_cropped: List of region descriptions that were cropped
         total_height: Height of final stitched image
+        crop_dimensions: CropDimensions used for the crop (optional, for single-region croppers)
     """
     original_dimensions: Tuple[int, int]  # width, height
     source_key: str
     regions_cropped: List[str]  # Description of regions cropped
     total_height: int  # Height of final image
+    crop_dimensions: Optional[CropDimensions] = None
 
 @dataclass
 class CropRegion:
@@ -150,6 +152,7 @@ class BaseCropper(CropperBase):
                 regions=["main_content"],
                 result_height=cropped.height
             )
+            metadata.crop_dimensions = dims
             
             return cropped, metadata
             
