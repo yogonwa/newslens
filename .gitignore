@@ -39,3 +39,7 @@ backend/tests/fixtures/wapo_sample.html
 
 # Ignore test screenshots
 test_fullsize_screenshot.png
+
+# New additions
+screenshot_integration.log
+test_fullsize_screenshot_*.png
