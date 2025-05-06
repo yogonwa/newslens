@@ -231,3 +231,28 @@
 ## Environment Variable Management Cleanup (TODO)
 - [ ] Audit all modular libraries and their tests to ensure they do not load `.env` or access `os.environ` directly (except via `get_config()`).
 - [ ] For any scripts or test files that need to be run standalone, add a top-of-file `.env` loader or use a test setup fixture as appropriate.
+
+## Debugging: NewsGrid Not Showing Latest 2025-04-18 Data (Initial Checklist)
+
+- [ ] **MongoDB Checks**
+    - [ ] Confirm new documents for 2025-04-18 exist and are correctly structured.
+    - [ ] Ensure `display_timestamp` is a true `datetime` object and within the correct range (2025-04-18).
+- [ ] **S3 Checks**
+    - [ ] Verify S3 keys in MongoDB match actual files in the bucket.
+    - [ ] Confirm images are accessible via generated presigned URLs.
+- [ ] **Backend API Checks**
+    - [ ] Confirm `/snapshots` returns expected records for 2025-04-18.
+    - [ ] Check for errors or warnings in backend logs.
+    - [ ] Ensure date filtering logic matches the data format in MongoDB.
+- [ ] **Frontend Checks**
+    - [ ] Ensure frontend fetches `/snapshots` on load (not using cached/mock data).
+    - [ ] Check for errors in browser console or network tab.
+    - [ ] Confirm image URLs in the grid match the expected pattern for 2025-04-18.
+- [ ] **Data Contract Checks**
+    - [ ] Validate that API response fields (`id`, `sourceId`, `timestamp`, `imageUrl`, etc.) match frontend expectations.
+    - [ ] Ensure no ID/key mismatches that would prevent grid rendering.
+- [ ] **General**
+    - [ ] If any step above fails, debug that layer before proceeding.
+    - [ ] Review logs and API responses for clues if data is missing or not rendering.
+
+_Reference: See project context in Scraper_Refactor.md, NewsLens_Project_Brief.md, and backend/frontend code for full data flow and contract details._
