@@ -57,15 +57,15 @@ class ScreenshotService:
                 "timestamp": datetime.utcnow().isoformat()
             })
             
-    async def capture(self, url: str) -> Optional[BytesIO]:
+    async def capture(self, url: str, return_html: bool = False) -> Optional[BytesIO]:
         """
         Capture a full-page screenshot of the given URL
-        
+        Optionally also return the HTML content.
         Args:
             url (str): URL to capture
-            
+            return_html (bool): If True, also return HTML content
         Returns:
-            Optional[BytesIO]: Screenshot as bytes if successful, None otherwise
+            Optional[BytesIO] or Tuple[BytesIO, str]: Screenshot as bytes if successful, None otherwise. If return_html is True, returns (BytesIO, html_str).
         """
         start_time = datetime.utcnow()
         log_ctx = {
@@ -73,7 +73,6 @@ class ScreenshotService:
             "start_time": start_time.isoformat(),
             "operation": "capture"
         }
-        
         context = None
         try:
             await self._init_browser()
@@ -82,23 +81,19 @@ class ScreenshotService:
                 device_scale_factor=2.0
             )
             page = await context.new_page()
-            
             # Configure timeouts
             page.set_default_navigation_timeout(120000)  # 2 minutes
             page.set_default_timeout(120000)
-            
             # Navigate and wait for basic content
             await page.goto(url, wait_until='domcontentloaded')
             await page.wait_for_selector('body')
-            
             # Capture screenshot
             screenshot_bytes = await page.screenshot(full_page=True, type='png')
-            
+            html = await page.content() if return_html else None
             # Log success with metrics
             end_time = datetime.utcnow()
             duration = (end_time - start_time).total_seconds()
             mem_usage = self._get_memory_usage()
-            
             log_ctx.update({
                 "status": "success",
                 "duration_seconds": duration,
@@ -106,9 +101,9 @@ class ScreenshotService:
                 "screenshot_size_bytes": len(screenshot_bytes)
             })
             logger.info("Screenshot captured successfully", extra=log_ctx)
-            
+            if return_html:
+                return BytesIO(screenshot_bytes), html
             return BytesIO(screenshot_bytes)
-            
         except Exception as e:
             log_ctx.update({
                 "status": "error",
@@ -116,8 +111,7 @@ class ScreenshotService:
                 "error_message": str(e)
             })
             logger.error("Screenshot capture failed", extra=log_ctx)
-            return None
-            
+            return None if not return_html else (None, None)
         finally:
             # Clean up context
             if context is not None:

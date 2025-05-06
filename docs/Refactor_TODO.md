@@ -192,3 +192,19 @@
 - [x] Finalize and expand end-to-end pipeline integration test (see test_e2e_pipeline.py; ensure full pipeline from Wayback to S3/DB works for all five sources)
 - [x] Save and visually inspect full-size screenshot from screenshot service integration test
 - [ ] Document or automate test image regeneration for croppers
+
+## Pipeline Next Steps (TODO)
+- [ ] Add retry logic for S3 and MongoDB operations using tenacity or similar.
+- [ ] Implement batch/concurrent processing for sources/times using asyncio.gather or semaphores.
+- [ ] Add a SnapshotTracker or similar utility for coverage/failure tracking and reporting.
+- [ ] Ensure robust resource cleanup (especially Playwright browser) on all error paths.
+- [ ] Allow logs to be written to a file or external system for long-term retention.
+- [ ] Optionally output a JSON or CSV summary of the run for downstream automation.
+- [ ] Add enhanced validation for extracted headlines and for S3/DB operation integrity.
+- [ ] Integrate with monitoring/alerting tools for high failure rates or performance issues.
+- [ ] Complete documentation and runbooks for CLI, logging, and error handling.
+
+## Architectural Improvements (TODO)
+- [ ] Refactor Playwright page loading and capture logic into a dedicated service or utility (e.g., PageCaptureService) for better modularity and testability.
+- [ ] Implement batch/concurrent processing using asyncio semaphores or task groups to improve throughput and scalability.
+- [ ] Add structured logging and retry logic to all major pipeline steps for improved observability and robustness.
