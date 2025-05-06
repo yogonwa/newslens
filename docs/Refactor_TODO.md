@@ -221,12 +221,12 @@
 - This approach is modular, extensible, testable, and production-ready.
 
 ### Immediate TODO (Blocking Backend Server Startup)
-- Refactor backend to use a single, explicit environment loader as described above.
-- Ensure backend/api/main.py (or main entrypoint) loads .env from the project root before any other imports.
-- Remove all other load_dotenv() calls from backend/services and backend/config.
-- Update all services to use config objects, not os.environ directly.
-- Validate and document all required environment variables.
-- Backend server is currently broken due to environment variable loading issues—address this as a priority before further development.
+- [x] Refactor backend to use a single, explicit environment loader as described above.
+- [x] Ensure backend/api/main.py (or main entrypoint) loads .env from the project root before any other imports.
+- [x] Remove all other load_dotenv() calls from backend/services and backend/config.
+- [x] Update all services to use config objects, not os.environ directly.
+- [x] Validate and document all required environment variables.
+- [x] Backend server is currently broken due to environment variable loading issues—address this as a priority before further development. (**Resolved: Environment variable management is now compliant; .env is only loaded in main entrypoints.**)
 
 ## Environment Variable Management Cleanup (TODO)
 - [ ] Audit all modular libraries and their tests to ensure they do not load `.env` or access `os.environ` directly (except via `get_config()`).

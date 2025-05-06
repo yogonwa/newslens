@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=Path(__file__).parent.parent.parent / ".env")
-
 class ConfigurationError(Exception):
     """Raised when configuration is invalid"""
     pass
