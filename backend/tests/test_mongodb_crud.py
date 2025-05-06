@@ -24,7 +24,7 @@ def make_test_doc():
             format="png",
             size=12345,
             dimensions={"width": 1920, "height": 1080},
-            wayback_url="https://web.archive.org/web/20240101000000/https://www.cnn.com/"
+            wayback_url="https://web.archive.org/web/20250101000000/https://www.cnn.com/"
         ),
         metadata=DocumentHeadlineMetadata(
             page_title="Test Page",

@@ -28,12 +28,15 @@ load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 get_config()
 
 @click.command()
-@click.option('--start-date', type=click.DateTime(formats=["%Y-%m-%d"]), required=True, help="Start date (YYYY-MM-DD)")
+@click.option('--start-date', type=click.DateTime(formats=["%Y-%m-%d"]), required=False, help="Start date (YYYY-MM-DD, defaults to 2025-04-18)")
 @click.option('--end-date', type=click.DateTime(formats=["%Y-%m-%d"]), help="End date (YYYY-MM-DD, defaults to start-date)")
 @click.option('--times', type=click.STRING, multiple=True, help="Times to capture (HH:MM, 24h format)")
 @click.option('--dry-run', is_flag=True, help="Skip DB and S3 operations")
 @click.option('--verbose', is_flag=True, help="Enable detailed logging")
 def main(start_date, end_date, times, dry_run, verbose):
+    # Default to 2025-04-18 if not specified
+    if not start_date:
+        start_date = datetime(2025, 4, 18)
     # Configure loguru logger
     logger.remove()
     logger.add(sys.stderr, level="DEBUG" if verbose else "INFO", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
@@ -71,7 +74,7 @@ async def run_pipeline(start_date, end_date, times, dry_run, verbose):
                     logger.error(f"Pipeline failed for {source['name']} at {target_dt}: {e}", extra={**context, "stage": "end", "status": "error", "error_message": str(e)})
         current += timedelta(days=1)
     # Log batch summary
-    logger.info(f"Pipeline run summary: {summary}", extra={"stage": "summary", **summary})
+    logger.info("Pipeline run summary: {}", summary, extra={"stage": "summary"})
 
 async def process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_run, verbose):
     context = {"source": source['id'], "display_timestamp": str(target_dt)}

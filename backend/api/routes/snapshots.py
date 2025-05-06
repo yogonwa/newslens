@@ -17,8 +17,12 @@ SOURCE_ID_MAP = {
 @router.get("/snapshots")
 def get_snapshots():
     s3_service = S3Service()
-    # Fetch all headline documents for MVP (no date filter)
-    docs = db_ops.headlines.find({})
+    # Filter for documents with display_timestamp on 2025-04-18
+    start_dt = datetime(2025, 4, 18)
+    end_dt = datetime(2025, 4, 19)
+    docs = db_ops.headlines.find({
+        "display_timestamp": {"$gte": start_dt, "$lt": end_dt}
+    })
     response = []
     for doc in docs:
         # Main headline is the first in the list, subheadlines are the rest
