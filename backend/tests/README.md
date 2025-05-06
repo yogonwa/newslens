@@ -14,6 +14,8 @@ This directory contains unit, integration, and end-to-end tests for the backend 
 - `images/`: Test fixture images (do not delete)
 - `crop_outputs/`: Cropped image outputs for visual inspection
 - `fixtures/`: HTML and other test fixtures
+- `archived/test_modern_croppers.py`: Modern cropper integration test for all 5 sources (see below)
+- `../../scripts/generate_presigned_url.py`: Utility to generate S3 pre-signed URLs for test/e2e outputs
 
 ## Running Tests
 
@@ -28,9 +30,33 @@ This directory contains unit, integration, and end-to-end tests for the backend 
 4. **Run a specific test:**
    - `pytest backend/tests/test_croppers.py`
 
+## Archived/Modern Cropper Integration Test
+
+- **Script:** `scripts/archived/test_modern_croppers.py`
+- **Description:** Runs the modern screenshot and cropper pipeline for all 5 major sources (CNN, Fox News, NYT, USA Today, Washington Post) using Wayback URLs. Saves both the full screenshot and cropped output for each source in the `temp/` directory for visual inspection.
+- **Run with:**
+  ```bash
+  PYTHONPATH=. python scripts/archived/test_modern_croppers.py
+  ```
+- **Outputs:**
+  - `temp/{source}_modern.png` (full screenshot)
+  - `temp/{source}_modern_cropped.png` (cropped image)
+
+## S3 Pre-signed URL Utility
+
+- **Script:** `scripts/generate_presigned_url.py`
+- **Description:** Generates pre-signed S3 URLs for the latest test/e2e PNGs for browser-based visual inspection. Useful for sharing or reviewing outputs stored in S3.
+- **Run with:**
+  ```bash
+  python scripts/generate_presigned_url.py
+  ```
+- **Outputs:**
+  - Prints pre-signed URLs for all 5 test/e2e PNGs to the console (valid for 1 hour by default).
+
 ## Outputs
 - Screenshot integration tests save files as `test_fullsize_screenshot_<source>.png` in the project root.
 - Cropper tests save outputs in `backend/tests/crop_outputs/`.
+- Modern cropper integration test saves outputs in `temp/`.
 
 ## Troubleshooting
 - Ensure test images in `backend/tests/images/` are present and not gitignored.

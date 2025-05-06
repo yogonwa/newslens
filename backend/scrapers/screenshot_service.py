@@ -71,7 +71,10 @@ class ScreenshotService:
         context = None
         try:
             await self._init_browser()
-            context = await self.browser.new_context(viewport=self.viewport)
+            context = await self.browser.new_context(
+                viewport={"width": 1920, "height": 2000},
+                device_scale_factor=2.0
+            )
             page = await context.new_page()
             
             # Configure timeouts
