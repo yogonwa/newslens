@@ -7,18 +7,10 @@ import unicodedata
 
 class HeadlineExtractor(ABC):
     """Abstract base class for source-specific headline extractors"""
-    
-    @abstractmethod
-    def extract_headlines(self, soup: BeautifulSoup, base_url: str) -> List[Dict]:
-        """Extract headlines from the source"""
-        pass
-        
     def clean_text(self, text: str) -> str:
         """Clean and normalize text content"""
         if not text:
             return text
-            
-        # Replace common Unicode quotes and apostrophes with ASCII versions
         replacements = {
             '\u2018': "'",  # Left single quote
             '\u2019': "'",  # Right single quote
@@ -27,13 +19,9 @@ class HeadlineExtractor(ABC):
             '\u2013': '-',  # En dash
             '\u2014': '--', # Em dash
         }
-        
         for old, new in replacements.items():
             text = text.replace(old, new)
-            
-        # Normalize remaining unicode characters
         text = unicodedata.normalize('NFKC', text)
-        # Remove extra whitespace
         text = ' '.join(text.split())
         return text
 
@@ -244,80 +232,31 @@ class WaPoHeadlineExtractor(HeadlineExtractor):
             return []
 
 class USATodayHeadlineExtractor(HeadlineExtractor):
-    """USA Today-specific headline extraction"""
-    
-    CATEGORY_PRIORITIES = {
-        'GRAPHICS': 1,  # Top table graphics
-        'CELEBRITIES': 2,  # Top table celebrities
-        'WORLD': 3,  # Top table world news
-        'U.S. News': 4,
-        'Investigations': 5,
-        'Politics': 6,
-        'Sports': 7,
-        'Entertainment': 8,
-        'Tech': 9,
-        'Wellness': 10,
-        'Travel': 11,
-        'Money': 12,
-        'Shopping': 13,
-        'USA TODAY 10BEST': 14,
-        'Just Curious': 15,
-        'Opinion': 16,
-        'Tax Season': 17,
-        'Trending Video': 18
-    }
-    
+    """USA Today-specific headline extraction, focused on above-the-fold headlines only."""
     def extract_headlines(self, soup: BeautifulSoup, base_url: str) -> List[Dict]:
         headlines = []
-        # Only extract from the top table (above the fold)
-        top_table = soup.find('div', class_='gnt_m_tt')
-        if top_table:
-            # Hero headline
-            hero = top_table.find('a', class_='gnt_m_he')
-            if hero:
-                headline_elem = hero.find('span', attrs={'data-tb-title'})
-                subtitle_elem = hero.find('div', class_='gnt_sbt')
-                if headline_elem:
-                    url = hero.get('href', '')
-                    if 'web.archive.org' in url:
-                        url_parts = url.split('/https://')
-                        if len(url_parts) > 1:
-                            url = 'https://' + url_parts[-1]
-                    elif not url.startswith('http'):
-                        url = base_url + url
-                    category = subtitle_elem.get('data-c-ms', '') if subtitle_elem else None
-                    timestamp = subtitle_elem.get('data-c-dt', '') if subtitle_elem else None
-                    headlines.append({
-                        'headline': headline_elem.get_text(strip=True),
-                        'category': category,
-                        'timestamp': timestamp,
-                        'url': url,
-                        'priority': 0
-                    })
-            # First 5 regular tiles
-            for article in top_table.find_all('a', class_='gnt_m_tl')[:5]:
-                if article.get('rel') == 'sponsored':
-                    continue
-                headline_elem = article.find('div', class_='gnt_m_tl_c')
-                subtitle_elem = article.find('div', class_='gnt_sbt')
-                if headline_elem:
-                    url = article.get('href', '')
-                    if 'web.archive.org' in url:
-                        url_parts = url.split('/https://')
-                        if len(url_parts) > 1:
-                            url = 'https://' + url_parts[-1]
-                    elif not url.startswith('http'):
-                        url = base_url + url
-                    category = subtitle_elem.get('data-c-ms', '') if subtitle_elem else None
-                    timestamp = subtitle_elem.get('data-c-dt', '') if subtitle_elem else None
-                    priority = self.CATEGORY_PRIORITIES.get(category, 20)
-                    headlines.append({
-                        'headline': headline_elem.get_text(strip=True),
-                        'category': category,
-                        'timestamp': timestamp,
-                        'url': url,
-                        'priority': priority
-                    })
+        # 1. Hero headline
+        hero = soup.select_one('.gnt_m_he span[data-tb-title]')
+        if hero and hero.text.strip():
+            headlines.append({'headline': hero.text.strip()})
+        # 2. Top table left column (main tiles)
+        left_tiles = soup.select('.gnt_m_tl div[data-tb-title]')
+        for tile in left_tiles[:3]:
+            text = tile.text.strip()
+            if text:
+                headlines.append({'headline': text})
+        # 3. Top table right column (list items)
+        right_tiles = soup.select('.gnt_m_tli div[data-tb-title]')
+        for tile in right_tiles[:3]:
+            text = tile.text.strip()
+            if text:
+                headlines.append({'headline': text})
+        # 4. More Top Stories (optional, direct text only)
+        more_top = soup.select('.gnt_m_sl_a')
+        for a in more_top[:2]:
+            text = ''.join(a.find_all(string=True, recursive=False)).strip()
+            if text:
+                headlines.append({'headline': text})
         return headlines
 
 def get_extractor(source: str) -> Optional[HeadlineExtractor]:

@@ -22,8 +22,8 @@ def inspect_headlines():
     for source, url in URLS.items():
         print(f"\n=== {source.upper()} ===")
         extractor = get_extractor(source)
-        html = requests.get(url).text
-        soup = BeautifulSoup(html, "html.parser")
+        resp = requests.get(url)
+        soup = BeautifulSoup(resp.text, "html.parser")
         headlines = extractor.extract_headlines(soup, base_url=BASE_URLS[source])
         if not headlines:
             print("No headlines extracted.")

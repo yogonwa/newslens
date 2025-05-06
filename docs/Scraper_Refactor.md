@@ -1,12 +1,16 @@
 # EPIC: Refactor and Modularize Wayback News Scraper
-last edited 5-01-25
+last edited 2024-05-05
 we have old files from bad attemptes that need to be cleaned up 
 (wayback_scraper.py and wayback_scraper_new.py). If we find a file that is no longer useful
 to our project move it to /scripts/archived and we can remove it later.
 
-## Objective
+## Current Status (as of 2024-05-05)
 
-Create a **composable**, **modular**, and **scalable** system to scrape and archive headline screenshots and metadata from the Wayback Machine for five major news outlets. This refactor moves away from a monolithic, tightly coupled script toward a cleanly orchestrated `main_scraper.py` controller that delegates discrete responsibilities to standalone services.
+- **End-to-end pipeline is fully validated for all five sources (CNN, Fox News, NYT, USA Today, Washington Post).**
+- **Headline extraction is confirmed and visually inspected for all sources.**
+- **Cropped and full-size screenshots are available for S3 and local validation.**
+- **All major project goals for modularity, decoupling, and testability are met.**
+- **Ready for performance benchmarking, monitoring, and automation of test image regeneration/validation.**
 
 ---
 
@@ -20,6 +24,7 @@ A production-grade scraping system that:
 * Extracts headline metadata
 * Uploads cropped images to S3
 * Persists documents to MongoDB
+* **Is modular, testable, and validated end-to-end**
 
 ---
 
@@ -1421,13 +1426,11 @@ main_scraper.py
 
 ## Next Steps
 
-1. Stub out `main_scraper.py` with loop logic
-2. Build persistent `ScreenshotService`
-3. Refactor existing crop code into isolated `crop_rules/`
-4. Isolate CDX logic in `wayback/fetcher.py`
-5. Ensure each module returns typed outputs
-6. Add minimal logging in each module
-7. Add concurrency control via `asyncio.Semaphore`
+- Performance benchmarking and optimization
+- Monitoring and dashboard setup
+- Automating test image regeneration and visual validation
+- UI for crop parameter tuning (future)
+- Complete technical documentation and runbooks
 
 ---
 

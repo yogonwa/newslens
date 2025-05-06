@@ -53,16 +53,16 @@ This directory contains unit, integration, and end-to-end tests for the backend 
 - **Outputs:**
   - Prints pre-signed URLs for all 5 test/e2e PNGs to the console (valid for 1 hour by default).
 
+## Headline Extraction Inspection Script
+
+- **Script:** `scripts/inspect_headlines.py`
+- **Description:** Fetches Wayback URLs for all 5 major sources and prints the extracted headlines using the standardized extractor interface. Useful for manual/visual validation of headline extraction logic.
+- **Run with:**
+  ```bash
+  PYTHONPATH=. python scripts/inspect_headlines.py
+  ```
+- **Outputs:**
+  - Prints extracted headlines for each source to the console for review.
+
 ## Outputs
-- Screenshot integration tests save files as `test_fullsize_screenshot_<source>.png` in the project root.
-- Cropper tests save outputs in `backend/tests/crop_outputs/`.
-- Modern cropper integration test saves outputs in `temp/`.
-
-## Troubleshooting
-- Ensure test images in `backend/tests/images/` are present and not gitignored.
-- If Playwright or browser errors occur, rerun `python -m playwright install`.
-- MongoDB and S3 tests require valid credentials in `.env`.
-
-## Notes
-- Do not delete or ignore `backend/tests/images/` unless you have a backup.
-- `.DS_Store` and other system files are ignored by default. 
+- Screenshot integration tests save files as `
