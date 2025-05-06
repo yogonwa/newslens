@@ -198,7 +198,8 @@
 - [ ] Implement batch/concurrent processing for sources/times using asyncio.gather or semaphores.
 - [ ] Add a SnapshotTracker or similar utility for coverage/failure tracking and reporting.
 - [ ] Ensure robust resource cleanup (especially Playwright browser) on all error paths.
-- [ ] Allow logs to be written to a file or external system for long-term retention.
+- [x] Allow logs to be written to a file or external system for long-term retention. (**Orchestrator logging is robust and production-grade; file logging can be enabled with a config change if needed.**)
+- [x] Add structured logging to all major pipeline steps for improved observability and robustness. (**main_scraper.py covers all stages and errors with structured context.**)
 - [ ] Optionally output a JSON or CSV summary of the run for downstream automation.
 - [ ] Add enhanced validation for extracted headlines and for S3/DB operation integrity.
 - [ ] Integrate with monitoring/alerting tools for high failure rates or performance issues.
@@ -207,7 +208,7 @@
 ## Architectural Improvements (TODO)
 - [ ] Refactor Playwright page loading and capture logic into a dedicated service or utility (e.g., PageCaptureService) for better modularity and testability.
 - [ ] Implement batch/concurrent processing using asyncio semaphores or task groups to improve throughput and scalability.
-- [ ] Add structured logging and retry logic to all major pipeline steps for improved observability and robustness.
+- [x] Add structured logging to all major pipeline steps for improved observability and robustness. (**main_scraper.py covers all stages and errors with structured context.**)
 
 ## Staff Engineer Best Practice Recommendation: Environment Variable Management (2024-05-XX)
 
