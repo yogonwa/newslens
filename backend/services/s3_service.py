@@ -1,11 +1,10 @@
-import os
 import logging
 import boto3
 from botocore.exceptions import ClientError
-from dotenv import load_dotenv
 from typing import Optional, List
+from backend.config import get_config
 
-load_dotenv()
+config = get_config()
 
 """
 s3_service.py
@@ -20,13 +19,13 @@ class S3Service:
     Handles uploads, downloads, presigned URLs, and batch deletions.
     """
     def __init__(self, bucket_name: Optional[str] = None, region: Optional[str] = None):
-        """Initialize S3Service with optional bucket and region (defaults to env vars)."""
-        self.bucket_name = bucket_name or os.getenv('S3_BUCKET_NAME')
-        self.region = region or os.getenv('AWS_DEFAULT_REGION')
+        """Initialize S3Service with optional bucket and region (defaults to config)."""
+        self.bucket_name = bucket_name or config.s3['bucket']
+        self.region = region or config.s3['region']
         self.s3_client = boto3.client(
             's3',
-            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            aws_access_key_id=config.s3['access_key_id'],
+            aws_secret_access_key=config.s3['secret_access_key'],
             region_name=self.region
         )
         self.logger = logging.getLogger(__name__)

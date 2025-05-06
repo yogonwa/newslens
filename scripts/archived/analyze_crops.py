@@ -7,10 +7,10 @@ import boto3
 from botocore.exceptions import ClientError
 import json
 from datetime import datetime
-from dotenv import load_dotenv
+from backend.config import get_config
 
 # Load environment variables
-load_dotenv()
+config = get_config()
 
 class CropAnalyzer:
     def __init__(self, root):
@@ -19,7 +19,7 @@ class CropAnalyzer:
         
         # S3 client setup
         self.s3 = boto3.client('s3')
-        self.bucket = os.getenv('S3_BUCKET_NAME')
+        self.bucket = config.get('S3_BUCKET_NAME')
         if not self.bucket:
             raise ValueError("S3_BUCKET_NAME environment variable not set")
         

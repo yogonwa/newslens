@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+load_dotenv(dotenv_path=Path(__file__).parent.parent.parent / ".env")
+
 class ConfigurationError(Exception):
     """Raised when configuration is invalid"""
     pass
@@ -27,9 +29,9 @@ class BaseConfig:
     
     def __init__(self):
         # Load environment variables
-        env_file = Path('.env')
-        if env_file.exists():
-            load_dotenv(env_file)
+        # env_file = Path('.env')
+        # if env_file.exists():
+        #     load_dotenv(env_file)
             
         # Validate required variables
         self._validate_env()
@@ -37,6 +39,8 @@ class BaseConfig:
         # Initialize sub-configurations
         self.mongodb = self._init_mongodb_config()
         self.s3 = self._init_s3_config()
+        self.log_level = os.getenv('LOG_LEVEL', 'INFO')
+        self.environment = os.getenv('ENVIRONMENT', 'development')
         
     def _validate_env(self):
         """Validate all required environment variables are present and of correct type"""

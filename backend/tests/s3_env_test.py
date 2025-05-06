@@ -1,15 +1,12 @@
-import os
-from dotenv import load_dotenv
+from backend.config import get_config
+config = get_config()
 import boto3
 from botocore.exceptions import NoCredentialsError, ClientError
 
-# Load environment variables from .env
-load_dotenv()
-
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_DEFAULT_REGION = os.getenv('AWS_DEFAULT_REGION')
-S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = config['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = config['AWS_SECRET_ACCESS_KEY']
+AWS_DEFAULT_REGION = config['AWS_DEFAULT_REGION']
+S3_BUCKET_NAME = config['S3_BUCKET_NAME']
 
 def main():
     print(f"Testing S3 access for bucket: {S3_BUCKET_NAME}")

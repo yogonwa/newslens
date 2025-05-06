@@ -10,7 +10,7 @@ See README.md for usage and docs/Scraper_Refactor.md for architecture.
 import asyncio
 import click
 from datetime import datetime, timedelta
-from backend.config import SOURCES, DEFAULT_CAPTURE_TIMES
+from backend.config import SOURCES, DEFAULT_CAPTURE_TIMES, get_config
 from backend.scrapers.wayback.fetcher import WaybackFetcher
 from backend.scrapers.screenshot_service import ScreenshotService
 from backend.scrapers.extractors.headline_extractors import get_extractor
@@ -21,6 +21,11 @@ from io import BytesIO
 from PIL import Image
 from loguru import logger
 import sys
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+get_config()
 
 @click.command()
 @click.option('--start-date', type=click.DateTime(formats=["%Y-%m-%d"]), required=True, help="Start date (YYYY-MM-DD)")

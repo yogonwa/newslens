@@ -4,15 +4,15 @@ import boto3
 from PIL import Image
 from io import BytesIO
 import tempfile
-from dotenv import load_dotenv
+from backend.config import get_config
 
 # Load environment variables
-load_dotenv()
+config = get_config()
 
 class ScreenshotCropper:
     def __init__(self):
         self.s3 = boto3.client('s3')
-        self.bucket = os.getenv('S3_BUCKET_NAME')
+        self.bucket = config['S3_BUCKET_NAME']
         if not self.bucket:
             raise ValueError("S3_BUCKET_NAME environment variable not set")
         

@@ -227,3 +227,7 @@
 - Update all services to use config objects, not os.environ directly.
 - Validate and document all required environment variables.
 - Backend server is currently broken due to environment variable loading issues—address this as a priority before further development.
+
+## Environment Variable Management Cleanup (TODO)
+- [ ] Audit all modular libraries and their tests to ensure they do not load `.env` or access `os.environ` directly (except via `get_config()`).
+- [ ] For any scripts or test files that need to be run standalone, add a top-of-file `.env` loader or use a test setup fixture as appropriate.

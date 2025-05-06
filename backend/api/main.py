@@ -1,28 +1,24 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import yaml
-import os
-from pathlib import Path
 from backend.api.routes import health
 from backend.api.routes import snapshots
+from backend.config import get_config
 
-# Load configuration
-config_path = Path(__file__).parent.parent / "config" / "development.yaml"
-with open(config_path) as f:
-    config = yaml.safe_load(f)
+# Load and validate environment variables
+config = get_config()
 
 # Create FastAPI app
 app = FastAPI(
     title="NewsLens API",
     description="API for NewsLens news analysis platform",
     version="0.1.0",
-    debug=config["api"]["debug"]
+    debug=config.environment == "development"
 )
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config["api"]["cors_origins"],
+    allow_origins=["*"],  # Optionally use config.cors_origins if you add it to config
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,11 +1,11 @@
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from dotenv import load_dotenv
-import os
-
-# Load environment variables
-load_dotenv()
+from backend.config import get_config
 
 # Create FastAPI app
 app = FastAPI(
@@ -27,10 +27,12 @@ app.add_middleware(
 from api.routes import health
 app.include_router(health.router, prefix="/api/v1/health", tags=["health"])
 
+config = get_config()
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host=os.getenv("API_HOST", "0.0.0.0"),
-        port=int(os.getenv("API_PORT", 8000)),
-        reload=os.getenv("ENVIRONMENT") == "development",
+        host=getattr(config, "api_host", "0.0.0.0"),
+        port=int(getattr(config, "api_port", 8000)),
+        reload=getattr(config, "environment", "development") == "development",
     ) 
