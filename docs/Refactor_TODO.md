@@ -208,3 +208,22 @@
 - [ ] Refactor Playwright page loading and capture logic into a dedicated service or utility (e.g., PageCaptureService) for better modularity and testability.
 - [ ] Implement batch/concurrent processing using asyncio semaphores or task groups to improve throughput and scalability.
 - [ ] Add structured logging and retry logic to all major pipeline steps for improved observability and robustness.
+
+## Staff Engineer Best Practice Recommendation: Environment Variable Management (2024-05-XX)
+
+- Centralize environment variable loading in a single config module (e.g., backend/config/env.py).
+- Always load the .env file from the project root using an absolute path, regardless of working directory.
+- Remove scattered load_dotenv() calls from submodules/services; only load once at the top of the main entrypoint.
+- Use dependency injection for config objects in services, not direct os.environ access.
+- Validate all required variables at startup and fail fast if missing.
+- Document all required variables in .env.example and README.
+- Never rely on working directory for .env loading; always use absolute paths.
+- This approach is modular, extensible, testable, and production-ready.
+
+### Immediate TODO (Blocking Backend Server Startup)
+- Refactor backend to use a single, explicit environment loader as described above.
+- Ensure backend/api/main.py (or main entrypoint) loads .env from the project root before any other imports.
+- Remove all other load_dotenv() calls from backend/services and backend/config.
+- Update all services to use config objects, not os.environ directly.
+- Validate and document all required environment variables.
+- Backend server is currently broken due to environment variable loading issues—address this as a priority before further development.
