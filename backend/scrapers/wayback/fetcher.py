@@ -1,3 +1,9 @@
+"""
+fetcher.py
+
+Provides WaybackFetcher for querying the Wayback Machine CDX API and retrieving the closest archived snapshot for a given URL and time.
+Used in the NewsLens pipeline to obtain historical news homepages for screenshotting and analysis.
+"""
 from datetime import datetime
 from typing import Dict, Optional
 import logging

@@ -135,3 +135,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 This README is for developers, contributors, and automation agents (e.g., Chat cursor bot) to understand project goals, current status, and next steps. All implementation should align with the day-based, multi-slot news comparison vision.
 # Test commit to check repo status
 # Test push to check if repo is back online
+
+## Backend Orchestration
+
+The main entry point for the full scraping pipeline is `main_scraper.py` at the project root.
+
+**To run the full pipeline:**
+```bash
+python main_scraper.py --start-date 2025-04-18 --end-date 2025-04-18 --times 06:00 09:00 12:00 15:00 18:00
+```
+
+See `docs/Scraper_Refactor.md` and `backend/tests/README.md` for detailed backend and test documentation.

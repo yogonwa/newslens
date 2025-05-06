@@ -1,3 +1,12 @@
+"""
+inspect_headlines.py
+
+Fetches Wayback URLs for all 5 major sources and prints the extracted headlines using the standardized extractor interface.
+Useful for manual/visual validation of headline extraction logic.
+
+Run with:
+    PYTHONPATH=. python scripts/inspect_headlines.py
+"""
 from backend.scrapers.extractors.headline_extractors import get_extractor
 from bs4 import BeautifulSoup
 import requests

@@ -1,3 +1,9 @@
+"""
+screenshot_service.py
+
+Provides ScreenshotService for capturing high-resolution, full-page screenshots using Playwright.
+Used in the NewsLens pipeline to capture Wayback Machine or live news homepages for further cropping and analysis.
+"""
 from datetime import datetime
 import logging
 import asyncio

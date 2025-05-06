@@ -6,7 +6,18 @@ from .connection import db_connection
 from backend.config import get_config
 from .models import HeadlineDocument, SourceDocument
 
+"""
+operations.py
+
+Provides DatabaseOperations for CRUD and query operations on MongoDB collections for sources and headlines.
+Used in the NewsLens pipeline to persist and retrieve news source and headline metadata.
+"""
+
 class DatabaseOperations:
+    """
+    Handles CRUD operations and queries for news sources and headlines in MongoDB.
+    Provides methods for adding, updating, listing, and deleting documents.
+    """
     def __init__(self):
         self.db = db_connection.db
         self.config = get_config()

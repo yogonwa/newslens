@@ -1,3 +1,12 @@
+"""
+generate_presigned_url.py
+
+Generates pre-signed S3 URLs for the latest test/e2e PNGs for browser-based visual inspection.
+Useful for sharing or reviewing outputs stored in S3.
+
+Run with:
+    python scripts/generate_presigned_url.py
+"""
 import boto3
 from botocore.exceptions import NoCredentialsError
 
