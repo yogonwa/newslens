@@ -93,4 +93,45 @@ class BaseConfig:
                 'date_format': '%Y-%m-%d',
                 'filename_format': '{source_key}_{time}.png'
             }
-        } 
+        }
+
+DEFAULT_CAPTURE_TIMES = [
+    "06:00",
+    "09:00",
+    "12:00",
+    "15:00",
+    "18:00"
+]
+
+SOURCES = [
+    {
+        "name": "CNN",
+        "url": "https://www.cnn.com",
+        "key": "cnn.com",
+        "id": "cnn"
+    },
+    {
+        "name": "Fox News",
+        "url": "https://www.foxnews.com",
+        "key": "foxnews.com",
+        "id": "foxnews"
+    },
+    {
+        "name": "New York Times",
+        "url": "https://www.nytimes.com",
+        "key": "nytimes.com",
+        "id": "nytimes"
+    },
+    {
+        "name": "Washington Post",
+        "url": "https://www.washingtonpost.com",
+        "key": "washingtonpost.com",
+        "id": "washingtonpost"
+    },
+    {
+        "name": "USA Today",
+        "url": "https://www.usatoday.com",
+        "key": "usatoday.com",
+        "id": "usatoday"
+    }
+] 

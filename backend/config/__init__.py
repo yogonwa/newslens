@@ -3,7 +3,7 @@ Configuration Package
 """
 
 from typing import Optional
-from .base import BaseConfig
+from .base import BaseConfig, DEFAULT_CAPTURE_TIMES, SOURCES
 
 _config_instance: Optional[BaseConfig] = None
 

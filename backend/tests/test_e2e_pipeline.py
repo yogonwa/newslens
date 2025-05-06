@@ -9,8 +9,8 @@ from bson import ObjectId
 from io import BytesIO
 from bs4 import BeautifulSoup
 import asyncio
-import importlib
 import re
+from backend.scrapers.crop_rules import get_cropper
 
 # Parameterized test data for each source
 E2E_SOURCES = [
@@ -90,13 +90,12 @@ async def test_e2e_pipeline(params):
     # 2. Crop
     from PIL import Image
     image = Image.open(image_bytesio)
-    cropper_mod = importlib.import_module(cropper_module)
-    cropper = getattr(cropper_mod, cropper_class)()
+    cropper = get_cropper(source)
     # Support both BaseCropper and MultiRegionCropper
     if hasattr(cropper, "crop"):
         cropped, crop_metadata = cropper.crop(image)
     else:
-        raise RuntimeError(f"Cropper {cropper_class} does not have a crop() method")
+        raise RuntimeError(f"Cropper for {source} does not have a crop() method")
     output_bytes = BytesIO()
     cropped.save(output_bytes, format="PNG")
     output_bytes.seek(0)

@@ -250,4 +250,26 @@ class MultiRegionCropper(CropperBase):
         if not self._validate_base_requirements(cropped, metadata):
             return False
         """
-        pass 
+        pass
+
+def get_cropper(source_key: str):
+    """
+    Factory to return the correct cropper instance for a given source key.
+    """
+    if source_key == "cnn":
+        from .cnn import CNNCropper
+        return CNNCropper()
+    elif source_key == "foxnews":
+        from .fox import FoxNewsCropper
+        return FoxNewsCropper()
+    elif source_key == "nytimes":
+        from .nyt import NYTimesCropper
+        return NYTimesCropper()
+    elif source_key == "washingtonpost":
+        from .wapo import WaPostCropper
+        return WaPostCropper()
+    elif source_key == "usatoday":
+        from .usatoday import USATodayCropper
+        return USATodayCropper()
+    else:
+        raise ValueError(f"No cropper found for source key: {source_key}") 
