@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NewsSource, HeadlineSnapshot } from '../types';
+import { NewsSource, HeadlineSnapshot, NewsSnapshot } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -29,5 +29,10 @@ export const getLatestHeadlines = async (sourceIds?: string[]): Promise<Headline
   const response = await api.get('/headlines/latest', {
     params: { sourceIds: sourceIds?.join(',') }
   });
+  return response.data;
+};
+
+export const getNewsSnapshots = async (date: string): Promise<NewsSnapshot[]> => {
+  const response = await api.get('/snapshots', { params: { date } });
   return response.data;
 }; 

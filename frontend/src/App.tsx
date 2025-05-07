@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Home from './pages/Home';
-import Analysis from './pages/Analysis';
-import Clusters from './pages/Clusters';
+import Home from './routes/Home';
+import Analysis from './routes/Analysis';
+import Clusters from './routes/Clusters';
 import Navigation from './components/Navigation';
 
 function App() {
