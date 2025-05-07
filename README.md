@@ -1,5 +1,182 @@
 # NewsLens
 
+**NewsLens** is a modular full-stack system that captures, analyzes, and visualizes how news outlets frame headlines over time using historical snapshots from the Wayback Machine.
+
+It consists of:
+
+* 🧠 A **modular backend** for scraping, image cropping, metadata extraction, and uploading to MongoDB/S3
+* 🖥️ A **frontend app** for exploring and filtering snapshots visually across date, source, and time slots
+
+---
+
+## 🎯 MVP Features
+
+### ✅ Back End
+
+* Pulls Wayback snapshots per source & date
+* Captures full-page screenshots and crops per source rules
+* Extracts headline metadata and computes sentiment
+* Uploads cropped images to S3
+* Stores snapshot documents in MongoDB
+
+### ✅ Front End
+
+* Responsive grid UI showing 5x5 matrix of sources and time slots
+* Toggle sources on/off
+* Filter by text query
+* Navigate modal detail view w/ full image, headlines, sentiment, Wayback link
+* Pick a date and auto-refresh content
+* Accessible and responsive layout
+
+---
+
+## 🔮 Future Enhancements
+
+* 🎥 Timeline playback mode (auto-cycle through snapshots by day)
+* ⏱️ Cluster/word theme visualizations across time
+* 🧠 Compare sentiment or framing by outlet ("Fox vs CNN on Topic X")
+* 📦 Export filtered grid snapshots as image archive
+
+---
+
+## 🧱 Tech Stack
+
+### Backend
+
+* Python 3.9+ (FastAPI, Uvicorn)
+* MongoDB Atlas
+* AWS S3 (via `boto3`)
+* HTML scraping with `requests`, `beautifulsoup4`, `playwright`
+* Async: `motor`, `aiohttp`, `tenacity`
+* Image processing with Pillow
+* Logging with Loguru
+
+### Frontend
+
+* React 18 + TypeScript
+* Tailwind CSS
+* `@tanstack/react-query`
+* `axios`
+* Routing with React Router v6
+* Visualization: `recharts`, `d3-cloud`
+
+---
+
+## 📂 Project Layout
+
+```bash
+NewsLens/
+├── backend/                 # FastAPI + scraping + S3 + MongoDB logic
+│   └── api/routes/snapshots.py
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── routes/          # Top-level pages like Home, Analysis, NotFound
+│   │   ├── services/        # API client via axios
+│   │   ├── types/           # Shared TS interfaces
+│   │   └── App.tsx
+│   └── public/
+├── scripts/
+│   └── main_scraper.py      # CLI runner to orchestrate full backend snapshot run
+└── docs/
+    └── Frontend_Integration_Plan.md
+```
+
+---
+
+## 🧪 Running the App
+
+### 1. Backend
+
+```bash
+cd backend
+uvicorn main:app --reload
+```
+
+### 2. Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then visit: [http://localhost:5173](http://localhost:5173)
+
+Make sure the backend API is available at `/api/snapshots?date=YYYY-MM-DD`
+
+---
+
+## 🌐 Routing Behavior
+
+* `/` → redirects to `/:date` for today's snapshots
+* `/:date` → main NewsGrid view
+* `/analysis` → planned v2 route for visualizations
+* `*` → 404 Not Found fallback
+
+---
+
+## 🔌 API Contract
+
+* `GET /api/snapshots?date=YYYY-MM-DD`
+* Returns array of `NewsSnapshot` objects:
+
+```ts
+interface NewsSnapshot {
+  id: string; // `${sourceId}-${timeSlot}`
+  source: string;
+  time_slot: string;
+  main_headline: string;
+  sub_headlines: string[];
+  thumbnailUrl: string;
+  fullImageUrl: string;
+  sentiment: {
+    score: number;
+    magnitude: number;
+  };
+  wayback_url: string;
+}
+```
+
+---
+
+## 📈 Development Progress
+
+*  Snapshot grid w/ modal detail view
+*  Source toggle + text search filtering
+*  Date picker and dynamic route loading
+*  Performance optimizations (lazy loading, shimmer cells)
+*  404 fallback route
+* 🔄 Analysis page scaffolding (planned for v2)
+
+> For full component breakdown and implementation steps, see [`Frontend_Integration_Plan.md`](./docs/Frontend_Integration_Plan.md)
+
+---
+
+## 🙋 Contributing
+
+This is a solo project for now, but code is modular and organized for future contributors (or AI agents like Cursor).
+
+---
+
+## 📜 License
+
+MIT License. See [LICENSE](./LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+Inspired by projects and research in media bias detection, data visualization, and archival tools.
+
+Wayback Machine snapshots © Internet Archive.
+
+
+
+
+--- BELOW IS OLD README TO BE CLEANED UP-----
+# NewsLens
+
 NewsLens is a comprehensive news analysis platform that captures and analyzes news headlines from multiple sources over time. It combines Wayback Machine archiving with live site scraping to provide a historical perspective on news coverage.
 
 ## Features
@@ -133,8 +310,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Audience
 This README is for developers, contributors, and automation agents (e.g., Chat cursor bot) to understand project goals, current status, and next steps. All implementation should align with the day-based, multi-slot news comparison vision.
-# Test commit to check repo status
-# Test push to check if repo is back online
+
 
 ## Backend Orchestration
 
