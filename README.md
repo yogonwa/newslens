@@ -55,7 +55,7 @@ It consists of:
 
 * React 18 + TypeScript
 * Tailwind CSS
-* `@tanstack/react-query`
+* `@tanstack/react-query` (with QueryClientProvider at root)
 * `axios`
 * Routing with React Router v6
 * Visualization: `recharts`, `d3-cloud`
@@ -100,6 +100,19 @@ cd frontend
 npm install
 npm run dev
 ```
+
+- The app uses [@tanstack/react-query](https://tanstack.com/query/latest) for all data fetching. Ensure `QueryClientProvider` wraps your app in `src/main.tsx`:
+
+```tsx
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const queryClient = new QueryClient();
+// ...
+<QueryClientProvider client={queryClient}>
+  <App />
+</QueryClientProvider>
+```
+
+- If you see `No QueryClient set, use QueryClientProvider to set one`, make sure this provider is present at the root.
 
 Then visit: [http://localhost:5173](http://localhost:5173)
 

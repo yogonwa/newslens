@@ -54,6 +54,7 @@ def get_snapshots():
             "subHeadlines": sub_headlines,
             "imageUrl": image_url,
             "thumbnailUrl": thumbnail_url,
+            "fullImageUrl": image_url,
             "sentiment": {"score": 0, "magnitude": 0.5}  # Placeholder
         })
     return response 
