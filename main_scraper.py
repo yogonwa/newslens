@@ -24,6 +24,7 @@ import sys
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from backend.db.connection import db_connection
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 get_config()
 
@@ -34,6 +35,10 @@ get_config()
 @click.option('--dry-run', is_flag=True, help="Skip DB and S3 operations")
 @click.option('--verbose', is_flag=True, help="Enable detailed logging")
 def main(start_date, end_date, times, dry_run, verbose):
+    """
+    CLI entrypoint for the NewsLens scraping pipeline.
+    Configures logging and runs the async pipeline.
+    """
     # Default to 2025-04-18 if not specified
     if not start_date:
         start_date = datetime(2025, 4, 18)
@@ -43,40 +48,70 @@ def main(start_date, end_date, times, dry_run, verbose):
     asyncio.run(run_pipeline(start_date, end_date, times, dry_run, verbose))
 
 async def run_pipeline(start_date, end_date, times, dry_run, verbose):
+    """
+    Main async pipeline runner. Iterates over all sources, dates, and timeslots.
+    Handles orchestration, error logging, and resource cleanup.
+    """
     times = times or DEFAULT_CAPTURE_TIMES
     end_date = end_date or start_date
     summary = {"total": 0, "success": 0, "fail": 0, "failures": []}
 
-    # Initialize services
+    # Initialize all required services
     wayback = WaybackFetcher()
     screenshot = ScreenshotService()
     s3 = S3Service() if not dry_run else None
     db = db_ops if not dry_run else None
 
-    current = start_date
-    while current <= end_date:
-        for source in SOURCES:
-            for time_str in times:
-                target_dt = datetime.combine(current.date(), datetime.strptime(time_str, "%H:%M").time())
-                summary["total"] += 1
-                context = {
-                    "source": source['id'],
-                    "display_timestamp": str(target_dt),
-                }
-                logger.info(f"Starting pipeline for {source['name']} at {target_dt}", extra={**context, "stage": "start"})
-                try:
-                    await process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_run, verbose)
-                    summary["success"] += 1
-                    logger.info(f"Completed pipeline for {source['name']} at {target_dt}", extra={**context, "stage": "end", "status": "success"})
-                except Exception as e:
-                    summary["fail"] += 1
-                    summary["failures"].append({"source": source['id'], "display_timestamp": str(target_dt), "error": str(e)})
-                    logger.error(f"Pipeline failed for {source['name']} at {target_dt}: {e}", extra={**context, "stage": "end", "status": "error", "error_message": str(e)})
-        current += timedelta(days=1)
-    # Log batch summary
-    logger.info("Pipeline run summary: {}", summary, extra={"stage": "summary"})
+    try:
+        current = start_date
+        while current <= end_date:
+            for source in SOURCES:
+                for time_str in times:
+                    # Compute the target datetime for this slot
+                    target_dt = datetime.combine(current.date(), datetime.strptime(time_str, "%H:%M").time())
+                    summary["total"] += 1
+                    context = {
+                        "source": source['id'],
+                        "display_timestamp": str(target_dt),
+                    }
+                    logger.info(f"Starting pipeline for {source['name']} at {target_dt}", extra={**context, "stage": "start"})
+                    try:
+                        # Run the full pipeline for this source/timeslot
+                        await process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_run, verbose)
+                        summary["success"] += 1
+                        logger.info(f"Completed pipeline for {source['name']} at {target_dt}", extra={**context, "stage": "end", "status": "success"})
+                    except Exception as e:
+                        # Log and count failures
+                        summary["fail"] += 1
+                        summary["failures"].append({"source": source['id'], "display_timestamp": str(target_dt), "error": str(e)})
+                        logger.error(f"Pipeline failed for {source['name']} at {target_dt}: {e}", extra={**context, "stage": "end", "status": "error", "error_message": str(e)})
+            current += timedelta(days=1)
+        # Log batch summary after all runs
+        logger.info("Pipeline run summary: {}", summary, extra={"stage": "summary"})
+    finally:
+        # Resource cleanup (always runs, even on error)
+        try:
+            await screenshot.cleanup()
+            logger.info("ScreenshotService resources cleaned up.")
+        except Exception as e:
+            logger.error(f"Error during ScreenshotService cleanup: {e}")
+        try:
+            db_connection.close()
+            logger.info("MongoDB connection closed.")
+        except Exception as e:
+            logger.error(f"Error during MongoDB connection cleanup: {e}")
 
 async def process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_run, verbose):
+    """
+    Runs the full pipeline for a single source and time slot:
+    1. Fetch Wayback snapshot
+    2. Capture screenshot and HTML
+    3. Crop image
+    4. Extract headlines
+    5. Upload to S3
+    6. Save to MongoDB
+    Logs each stage and handles errors gracefully.
+    """
     context = {"source": source['id'], "display_timestamp": str(target_dt)}
     # 1. Fetch Wayback snapshot
     logger.info("Fetching Wayback snapshot", extra={**context, "stage": "fetch"})
