@@ -3,6 +3,15 @@
 ## Backend Task Prioritization (2024-05)
 
 ### Must-Have for Launch
+- [x] **Canonical Sources Collection**
+  - MongoDB now has a `news_sources` collection, seeded with all 5 canonical sources via a Python script in `backend/db/scripts/seed_sources.py`.
+- [x] **/api/sources Endpoint**
+  - FastAPI backend exposes `/api/sources`, returning all source metadata (id, short_id, name, color, logo, etc.).
+- [x] **Seed Script**
+  - Script is complete and tested; all sources are upserted and available for API use.
+- [ ] **Frontend Integration**
+  - The frontend is now ready to fetch sources dynamically from the backend, replacing all hardcoded source data and mockData.ts usage.
+  - Current focus: Integrate the new sources API into the frontend grid, controls, and all source-dependent UI.
 - [ ] **Performance/Load Testing**
   - Ensure backend can handle expected and peak loads without failures or slowdowns.
 - [ ] **Monitoring & Observability**
@@ -29,6 +38,12 @@
   - UI for tuning and debugging crop rules visually.
 - [ ] **ML-Based Crop/Extraction Enhancements**
   - Use ML to improve accuracy of cropping or headline extraction.
+
+### Current Status (2024-05-07)
+- Backend sources API and DB are complete and tested.
+- Frontend is at the integration step: all source metadata will be fetched from `/api/sources` at runtime.
+- The `mockData.ts` file has been deleted. All references to it in the prototype frontend must be audited and updated to use the new dynamic sources API.
+- Next: Remove all hardcoded source data and finish dynamic integration in the grid and controls.
 
 ---
 

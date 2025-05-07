@@ -12,6 +12,16 @@ A production-grade front-end application that:
 
 ---
 
+# Integration Progress Update (2024-05-07)
+
+- The backend now provides a dynamic `/api/sources` endpoint with all canonical source metadata, seeded from MongoDB.
+- The frontend has deleted `mockData.ts` and is now integrating dynamic source fetching from the backend for all grid and control logic.
+- All hardcoded source data is being removed; all references to `mockData.ts` in the prototype must be audited and updated to use the new sources API.
+- **Current status:** Integrating the frontend to use the new sources API for all source metadata, grid, and controls.
+- **Next steps:** Complete the audit, update all components, and test the dynamic integration.
+
+---
+
 # NewsLens Frontend Integration Plan
 
 This document outlines the implementation steps to integrate the existing frontend prototype with the live backend snapshot API for NewsLens. The integration uses `react-query`, `axios`, and fully typed TypeScript interfaces to ensure maintainability and performance.
@@ -226,7 +236,7 @@ The prototype currently uses a static date. Replace this with a dynamic date pic
 
 * [ ] Confirm new date triggers `useNewsSnapshots(date)` with formatted `YYYY-MM-DD`
 * [ ] Confirm grid refreshes without full reload
-* [ ] Confirm default state matches today’s date
+* [ ] Confirm default state matches today's date
 
 ---
 
@@ -400,7 +410,7 @@ Currently, all snapshots for a given day are fetched at once via a single API ca
 
 * [ ] Confirm shimmer placeholder renders for all cells before image loads
 * [ ] Verify image loading does not block grid paint
-* [ ] Benchmark with \~50 snapshots across different connections
+* [ ] Benchmark with ~50 snapshots across different connections
 
 ---
 
@@ -473,7 +483,7 @@ When a user navigates to an undefined route (e.g. `/wrong-url`), they should see
 
 1. **Create `NotFound.tsx` in `src/routes/`**
 
-````tsx
+```tsx
 import { useNavigate } from 'react-router-dom';
 
 export default function NotFound() {
@@ -482,7 +492,7 @@ export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center h-screen text-center p-8">
       <h1 className="text-4xl font-bold text-gray-700 mb-4">404 – Page Not Found</h1>
-      <p className="text-gray-500 mb-6">Sorry, we couldn’t find that page.</p>
+      <p className="text-gray-500 mb-6">Sorry, we couldn't find that page.</p>
       <button
         onClick={() => navigate('/')}
         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -492,18 +502,7 @@ export default function NotFound() {
     </div>
   );
 }
-``` in `src/routes/`**
-```tsx
-export default function NotFound() {
-  return (
-    <div className="flex flex-col items-center justify-center h-screen text-center p-8">
-      <h1 className="text-4xl font-bold text-gray-700 mb-4">404 – Page Not Found</h1>
-      <p className="text-gray-500 mb-6">Sorry, we couldn’t find that page.</p>
-      <a href="/" className="text-blue-600 hover:underline">Return to Home</a>
-    </div>
-  );
-}
-````
+```
 
 2. **Add wildcard route to `App.tsx`**:
 
@@ -518,38 +517,32 @@ export default function NotFound() {
 
 ---
 
-## 📎 Appendix: Core Types
+## 📎 Appendix: Core Types & Data Contract
 
-```ts
-export interface NewsSnapshot {
-  id: string; // Format: `${sourceId}-${timeSlot}`
-  source: string;
-  time_slot: string;
-  main_headline: string;
-  sub_headlines: string[];
-  screenshot_url: string;
-  thumbnailUrl: string;
-  fullImageUrl: string;
+### /api/snapshots Response Contract
+
+Each snapshot object returned by the backend has the following fields:
+
+```
+{
+  id: string,              // Format: `${sourceId}-${timeSlot}`
+  sourceId: string,        // Short string source key (e.g., 'cnn')
+  timestamp: string,       // ISO date string
+  mainHeadline: string,    // Main headline text
+  subHeadlines: string[],  // Array of sub-headline strings
+  imageUrl: string,        // [DEPRECATED] Use fullImageUrl instead
+  thumbnailUrl: string,    // Presigned S3 URL for thumbnail image
+  fullImageUrl: string,    // Presigned S3 URL for full-size image
   sentiment: {
-    score: number;
-    magnitude: number;
-  };
-  wayback_url: string;
-  created_at?: string;
-}
-
-export interface NewsSource {
-  _id: string;
-  name: string;
-  color: string;
-  isActive?: boolean;
-}
-
-export interface TimeSlot {
-  id: string;       // e.g., 'morning', 'afternoon'
-  label: string;    // e.g., 'Morning (8AM)'
+    score: number,         // Sentiment score (placeholder)
+    magnitude: number      // Sentiment magnitude (placeholder)
+  }
 }
 ```
+
+- `fullImageUrl` should be used for all full-size image displays (e.g., NewsDetail modal).
+- `thumbnailUrl` should be used for grid/cell thumbnails.
+- `imageUrl` is maintained for backward compatibility but will be removed in the future.
 
 ---
 
@@ -559,5 +552,15 @@ export interface TimeSlot {
 * [ ] Add integration tests for grid filtering behavior
 * [ ] Add accessibility roles/labels for modal and thumbnails
 * [ ] Add fallback image handling for broken S3 URLs
+
+---
+
+### API Integration Checklist
+
+- [x] Use @tanstack/react-query for all data fetching
+- [x] Create a QueryClient instance in src/main.tsx
+- [x] Wrap <App /> in <QueryClientProvider client={queryClient}> at the root
+- [x] All custom hooks (e.g., useNewsSnapshots) require this provider
+- [ ] If you see 'No QueryClient set, use QueryClientProvider to set one', ensure the provider is present at the root
 
 ---
