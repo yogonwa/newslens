@@ -235,25 +235,43 @@
 
 ## Debugging: NewsGrid Not Showing Latest 2025-04-18 Data (Initial Checklist)
 
-- [ ] **MongoDB Checks**
-    - [ ] Confirm new documents for 2025-04-18 exist and are correctly structured.
-    - [ ] Ensure `display_timestamp` is a true `datetime` object and within the correct range (2025-04-18).
-- [ ] **S3 Checks**
-    - [ ] Verify S3 keys in MongoDB match actual files in the bucket.
-    - [ ] Confirm images are accessible via generated presigned URLs.
-- [ ] **Backend API Checks**
-    - [ ] Confirm `/snapshots` returns expected records for 2025-04-18.
-    - [ ] Check for errors or warnings in backend logs.
-    - [ ] Ensure date filtering logic matches the data format in MongoDB.
-- [ ] **Frontend Checks**
-    - [ ] Ensure frontend fetches `/snapshots` on load (not using cached/mock data).
-    - [ ] Check for errors in browser console or network tab.
-    - [ ] Confirm image URLs in the grid match the expected pattern for 2025-04-18.
-- [ ] **Data Contract Checks**
-    - [ ] Validate that API response fields (`id`, `sourceId`, `timestamp`, `imageUrl`, etc.) match frontend expectations.
-    - [ ] Ensure no ID/key mismatches that would prevent grid rendering.
-- [ ] **General**
-    - [ ] If any step above fails, debug that layer before proceeding.
-    - [ ] Review logs and API responses for clues if data is missing or not rendering.
+- [x] **MongoDB Checks**
+    - [x] Confirm new documents for 2025-04-18 exist and are correctly structured.
+    - [x] Ensure `display_timestamp` is a true `datetime` object and within the correct range (2025-04-18).
+- [x] **S3 Checks**
+    - [x] Verify S3 keys in MongoDB match actual files in the bucket.
+    - [x] Confirm images are accessible via generated presigned URLs.
+- [x] **Backend API Checks**
+    - [x] Confirm `/snapshots` returns expected records for 2025-04-18.
+    - [x] Check for errors or warnings in backend logs.
+    - [x] Ensure date filtering logic matches the data format in MongoDB.
+- [x] **Frontend Checks**
+    - [x] Ensure frontend fetches `/snapshots` on load (not using cached/mock data).
+    - [x] Check for errors in browser console or network tab.
+    - [x] Confirm image URLs in the grid match the expected pattern for 2025-04-18.
+- [x] **Data Contract Checks**
+    - [x] Validate that API response fields (`id`, `sourceId`, `timestamp`, `imageUrl`, etc.) match frontend expectations.
+    - [x] Ensure no ID/key mismatches that would prevent grid rendering.
+- [x] **General**
+    - [x] If any step above fails, debug that layer before proceeding.
+    - [x] Review logs and API responses for clues if data is missing or not rendering.
+
+---
+
+### Debugging Summary (2024-05-06)
+- Cleared all data from S3 and MongoDB.
+- Re-ran @main_scraper.py for all sources for 2025-04-18 at 06:00.
+- Confirmed `/snapshots` endpoint returns correct data for 2025-04-18.
+- Webapp still shows "No data" in NewsGrid for that date/time.
+- All backend, S3, and DB checks pass; API returns expected records.
+- Troubleshooting indicates the issue is likely in the frontend/backend data contract or mapping logic (e.g., sourceId, id, or timeSlot alignment).
+
+### Next Steps for Debugging (to pick up later)
+- [ ] Review mapping between API response (`id`, `sourceId`, `timestamp`) and frontend grid expectations (`newsSources`, `timeSlots`).
+- [ ] Ensure that `sourceId` in API matches `_id` in frontend sources, and that `id`/`timeSlot` formats align.
+- [ ] Check if the frontend is filtering out valid API data due to mismatched IDs or time slot keys.
+- [ ] If needed, update either backend or frontend to ensure IDs and formats are consistent.
+- [ ] Add logging or debugging output in the frontend to inspect what data is received and how it is mapped to the grid.
+- [ ] If the frontend expects a different date or time slot structure, update the backend to support dynamic date filtering via query params.
 
 _Reference: See project context in Scraper_Refactor.md, NewsLens_Project_Brief.md, and backend/frontend code for full data flow and contract details._
