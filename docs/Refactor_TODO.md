@@ -1,5 +1,37 @@
 # NewsLens Scraper Refactor TODO
 
+## Backend Task Prioritization (2024-05)
+
+### Must-Have for Launch
+- [ ] **Performance/Load Testing**
+  - Ensure backend can handle expected and peak loads without failures or slowdowns.
+- [ ] **Monitoring & Observability**
+  - Set up structured logging, error alerting, and real-time monitoring for failures and slowdowns.
+- [ ] **Automated Test Image Regeneration & Visual Validation**
+  - Automate regeneration and validation of test images to prevent silent regressions in cropping or extraction.
+- [ ] **Data Contract Consistency**
+  - Ensure backend and frontend agree on all field names, types, and formats for seamless integration.
+- [ ] **Retry Logic for S3 and MongoDB Operations**
+  - Implement robust retry logic for all storage operations to prevent data loss or partial failures.
+
+### Strongly Recommended (for scaling/maintainability)
+- [ ] **Batch/Concurrent Processing Enhancements**
+  - Improve throughput and scalability for more sources or time slots.
+- [ ] **SnapshotTracker/Failure Reporting**
+  - Track missing or failed snapshots for data completeness and debugging.
+- [ ] **Documentation & Runbooks**
+  - Complete technical documentation and operational runbooks for onboarding and troubleshooting.
+- [ ] **Monitoring Dashboards**
+  - Visualize system health and trends for rapid triage and non-engineer visibility.
+
+### Nice-to-Have (future/optional)
+- [ ] **Visual Validation UI for Crops**
+  - UI for tuning and debugging crop rules visually.
+- [ ] **ML-Based Crop/Extraction Enhancements**
+  - Use ML to improve accuracy of cropping or headline extraction.
+
+---
+
 ## Progress Update (2024-05-05)
 
 - [x] All cropper base classes and source implementations complete and tested.
