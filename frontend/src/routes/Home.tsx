@@ -1,32 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import NewsGrid from '../components/NewsGrid';
 import Header from '../components/Header';
 import Controls from '../components/Controls';
 import Footer from '../components/Footer';
-import { newsSources, timeSlots, fetchNewsSnapshots } from '../utils/mockData';
+import { newsSources, timeSlots } from '../utils/mockData';
 import { NewsSnapshot } from '../types';
+import { useNewsSnapshots } from '../hooks/useNewsSnapshots';
 
 const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSourceIds, setActiveSourceIds] = useState(newsSources.map(source => source._id));
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [snapshots, setSnapshots] = useState<NewsSnapshot[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
-    fetchNewsSnapshots()
-      .then(data => {
-        setSnapshots(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError('Failed to load snapshots');
-        setLoading(false);
-      });
-  }, []);
-  
+  // Format selectedDate as YYYY-MM-DD
+  const formattedDate = selectedDate.toISOString().slice(0, 10);
+  const { data: snapshots = [], isLoading, isError } = useNewsSnapshots(formattedDate);
+
   const toggleSource = (sourceId: string) => {
     if (activeSourceIds.includes(sourceId)) {
       setActiveSourceIds(activeSourceIds.filter(id => id !== sourceId));
@@ -64,10 +53,10 @@ const Home: React.FC = () => {
           onDateChange={setSelectedDate}
           selectedDate={selectedDate}
         />
-        {loading ? (
+        {isLoading ? (
           <div className="text-center py-12">Loading snapshots...</div>
-        ) : error ? (
-          <div className="text-center text-red-600 py-12">{error}</div>
+        ) : isError ? (
+          <div className="text-center text-red-600 py-12">Failed to load snapshots</div>
         ) : activeSourceIds.length === 0 ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
             <p className="text-yellow-800 mb-4">No news sources selected</p>
