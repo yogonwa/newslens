@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Search, Menu, X } from 'lucide-react';
-import { getCurrentDate } from '../utils/mockData';
 
 interface HeaderProps {
   onSearchChange: (query: string) => void;
@@ -44,7 +43,12 @@ const Header: React.FC<HeaderProps> = ({ onSearchChange }) => {
           <div className="hidden md:flex items-center space-x-6">
             <div className="flex items-center text-gray-600">
               <Calendar size={18} className="mr-2" />
-              <span>{getCurrentDate()}</span>
+              <span>{new Date().toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}</span>
             </div>
             
             <div className="relative">
@@ -69,7 +73,12 @@ const Header: React.FC<HeaderProps> = ({ onSearchChange }) => {
           <div className="md:hidden mt-4 bg-white rounded-lg shadow-lg p-4 absolute left-4 right-4">
             <div className="flex items-center text-gray-600 mb-4">
               <Calendar size={18} className="mr-2" />
-              <span>{getCurrentDate()}</span>
+              <span>{new Date().toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}</span>
             </div>
             
             <div className="relative mb-4">

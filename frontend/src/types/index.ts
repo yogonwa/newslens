@@ -63,18 +63,18 @@ export interface SourceMetadata {
 }
 
 export interface NewsSource {
-  _id: string;
+  _id: string;         // MongoDB ObjectId as string
+  short_id: string;    // Canonical string key (e.g., "cnn")
   name: string;
-  url: string;
-  active: boolean;
-  metadata: SourceMetadata;
-  color?: string;
-  logoUrl?: string;
+  color: string;
+  logo_url?: string;
+  website?: string;
+  region?: string;
 }
 
 export interface NewsSnapshot {
   id: string;
-  sourceId: string;
+  short_id: string;
   timestamp: string;
   thumbnailUrl: string;
   fullImageUrl: string;

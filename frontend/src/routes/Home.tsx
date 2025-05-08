@@ -1,39 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NewsGrid from '../components/NewsGrid';
 import Header from '../components/Header';
 import Controls from '../components/Controls';
 import Footer from '../components/Footer';
-import { newsSources, timeSlots } from '../utils/mockData';
-import { NewsSnapshot } from '../types';
+import { STANDARD_TIME_SLOTS } from '../constants/timeSlots';
+import { NewsSnapshot, NewsSource } from '../types';
 import { useNewsSnapshots } from '../hooks/useNewsSnapshots';
+import { useQuery } from '@tanstack/react-query';
+import { getNewsSources } from '../services/api';
 
 const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeSourceIds, setActiveSourceIds] = useState(newsSources.map(source => source._id));
+  const { data: sources = [], isLoading: isSourcesLoading, isError: isSourcesError } = useQuery<NewsSource[], Error>({
+    queryKey: ['newsSources'],
+    queryFn: getNewsSources,
+  });
+  const [activeSourceIds, setActiveSourceIds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Format selectedDate as YYYY-MM-DD
   const formattedDate = selectedDate.toISOString().slice(0, 10);
   const { data: snapshots = [], isLoading, isError } = useNewsSnapshots(formattedDate);
 
-  const toggleSource = (sourceId: string) => {
-    if (activeSourceIds.includes(sourceId)) {
-      setActiveSourceIds(activeSourceIds.filter(id => id !== sourceId));
-    } else {
-      setActiveSourceIds([...activeSourceIds, sourceId]);
+  useEffect(() => {
+    if (sources.length > 0 && activeSourceIds.length === 0) {
+      setActiveSourceIds(sources.map(source => source.short_id));
     }
+  }, [sources]);
+
+  const toggleSource = (sourceId: string) => {
+    setActiveSourceIds(prev =>
+      prev.includes(sourceId)
+        ? prev.filter(id => id !== sourceId)
+        : [...prev, sourceId]
+    );
   };
   
   const toggleAllSources = (active: boolean) => {
     if (active) {
-      setActiveSourceIds(newsSources.map(source => source._id));
+      setActiveSourceIds(sources.map(source => source.short_id));
     } else {
       setActiveSourceIds([]);
     }
   };
   
   // Filter sources based on active IDs
-  const filteredSources = newsSources.filter(source => activeSourceIds.includes(source._id));
+  const filteredSources = sources.filter(source => activeSourceIds.includes(source.short_id));
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -46,17 +58,17 @@ const Home: React.FC = () => {
         </p>
         
         <Controls 
-          sources={newsSources}
+          sources={sources}
           activeSourceIds={activeSourceIds}
           onSourceToggle={toggleSource}
           onToggleAll={toggleAllSources}
           onDateChange={setSelectedDate}
           selectedDate={selectedDate}
         />
-        {isLoading ? (
-          <div className="text-center py-12">Loading snapshots...</div>
-        ) : isError ? (
-          <div className="text-center text-red-600 py-12">Failed to load snapshots</div>
+        {isSourcesLoading ? (
+          <div className="text-center py-12">Loading sources...</div>
+        ) : isSourcesError ? (
+          <div className="text-center text-red-600 py-12">Failed to load sources</div>
         ) : activeSourceIds.length === 0 ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
             <p className="text-yellow-800 mb-4">No news sources selected</p>
@@ -71,7 +83,7 @@ const Home: React.FC = () => {
           <NewsGrid 
             snapshots={snapshots}
             sources={filteredSources}
-            timeSlots={timeSlots}
+            timeSlots={STANDARD_TIME_SLOTS}
             searchQuery={searchQuery}
           />
         )}

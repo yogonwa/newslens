@@ -13,8 +13,8 @@ interface NewsGridProps {
 const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, searchQuery }) => {
   const [selectedSnapshot, setSelectedSnapshot] = useState<NewsSnapshot | null>(null);
   
-  const getSourceById = (id: string): NewsSource => {
-    return sources.find(source => source._id === id) || sources[0];
+  const getSourceById = (short_id: string): NewsSource => {
+    return sources.find(source => source.short_id === short_id) || sources[0];
   };
 
   const getSnapshotsByTimeSlot = (timeSlotId: string): NewsSnapshot[] => {
@@ -65,7 +65,7 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
       
       {/* Source rows */}
       {sources.map((source) => (
-        <div key={source._id} className="flex mb-8">
+        <div key={source.short_id} className="flex mb-8">
           {/* Source name column */}
           <div className="w-36 flex-shrink-0 pr-4 flex items-center">
             <div className="flex items-center">
@@ -79,7 +79,7 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
             {timeSlots.map((slot) => {
               const snapshotsForTimeSlot = getSnapshotsByTimeSlot(slot.id);
               const snapshotForSource = snapshotsForTimeSlot.find(
-                snapshot => snapshot.sourceId === source._id
+                snapshot => snapshot.short_id === source.short_id
               );
               
               // Skip rendering if filtered out by search
@@ -89,14 +89,14 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
                 !filteredSnapshots.some(s => s.id === snapshotForSource.id)
               ) {
                 return (
-                  <div key={`${source._id}-${slot.id}`} className="h-48 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 text-sm">
+                  <div key={`${source.short_id}-${slot.id}`} className="h-48 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 text-sm">
                     No match
                   </div>
                 );
               }
               
               return snapshotForSource ? (
-                <div key={`${source._id}-${slot.id}`} className="transition-all duration-300">
+                <div key={`${source.short_id}-${slot.id}`} className="transition-all duration-300">
                   <NewsCell 
                     snapshot={snapshotForSource} 
                     source={source}
@@ -104,7 +104,7 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
                   />
                 </div>
               ) : (
-                <div key={`${source._id}-${slot.id}`} className="h-48 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400">
+                <div key={`${source.short_id}-${slot.id}`} className="h-48 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400">
                   No data
                 </div>
               );
@@ -117,7 +117,7 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
       {selectedSnapshot && (
         <NewsDetail 
           snapshot={selectedSnapshot}
-          source={getSourceById(selectedSnapshot.sourceId)}
+          source={getSourceById(selectedSnapshot.short_id)}
           onClose={() => setSelectedSnapshot(null)}
           onPrevious={handlePrevious}
           onNext={handleNext}

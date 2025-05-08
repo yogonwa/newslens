@@ -1,14 +1,24 @@
 import React, { useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Calendar, Filter, Maximize2, Minimize2 } from 'lucide-react';
+import { STANDARD_TIME_SLOTS } from '../constants/timeSlots';
 // TODO: Refactor this page for real data integration. All code referencing newsSnapshots, newsSources, or timeSlots is commented out to prevent errors.
 // import { newsSnapshots, newsSources, timeSlots } from '../utils/mockData';
 // TODO: Refactor this page to use fetchNewsSnapshots or real data.
 // All usages of newsSnapshots are commented out for now to prevent runtime errors.
 import WordCloud from '../components/WordCloud';
 
+// TODO: Replace with dynamic API data (see /services/api.ts getNewsSources)
+const PLACEHOLDER_SOURCES = [
+  { id: 'cnn', name: 'CNN', color: '#cc0000' },
+  { id: 'foxnews', name: 'Fox News', color: '#003366' },
+  { id: 'nytimes', name: 'New York Times', color: '#000000' },
+  { id: 'washingtonpost', name: 'Washington Post', color: '#231f20' },
+  { id: 'usatoday', name: 'USA Today', color: '#0057b8' },
+];
+
 const Analysis: React.FC = () => {
-  const [selectedSources, setSelectedSources] = useState(newsSources.map(s => s.id));
+  const [selectedSources, setSelectedSources] = useState<string[]>(PLACEHOLDER_SOURCES.map(s => s.id));
   const [dateRange, setDateRange] = useState({
     start: new Date('2025-05-15'),
     end: new Date('2025-05-15')
@@ -16,7 +26,7 @@ const Analysis: React.FC = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const sentimentData = useMemo(() => {
-    return timeSlots.map(slot => {
+    return STANDARD_TIME_SLOTS.map(slot => {
       const slotData = { time: slot.label };
       selectedSources.forEach(sourceId => {
         // const snapshot = newsSnapshots.find(s => s.sourceId === sourceId && s.id.endsWith(`-${slot.id}`));
@@ -95,7 +105,7 @@ const Analysis: React.FC = () => {
 
   const toggleAllSources = () => {
     setSelectedSources(prev => 
-      prev.length === newsSources.length ? [] : newsSources.map(s => s.id)
+      prev.length === PLACEHOLDER_SOURCES.length ? [] : PLACEHOLDER_SOURCES.map(s => s.id)
     );
   };
 
@@ -144,7 +154,7 @@ const Analysis: React.FC = () => {
               onClick={toggleAllSources}
               className="flex items-center px-3 py-2 bg-blue-100 rounded-md hover:bg-blue-200"
             >
-              {selectedSources.length === newsSources.length ? (
+              {selectedSources.length === PLACEHOLDER_SOURCES.length ? (
                 <>
                   <Minimize2 size={18} className="mr-2 text-blue-600" />
                   <span>Hide All</span>
@@ -162,7 +172,7 @@ const Analysis: React.FC = () => {
         {/* Source filters */}
         {isFilterOpen && (
           <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-            {newsSources.map((source) => {
+            {PLACEHOLDER_SOURCES.map((source) => {
               const isActive = selectedSources.includes(source.id);
               return (
                 <div 
@@ -200,7 +210,7 @@ const Analysis: React.FC = () => {
               <Tooltip />
               <Legend />
               {selectedSources.map(sourceId => {
-                const source = newsSources.find(s => s.id === sourceId)!;
+                const source = PLACEHOLDER_SOURCES.find(s => s.id === sourceId)!;
                 return (
                   <Line
                     key={sourceId}
@@ -234,7 +244,7 @@ const Analysis: React.FC = () => {
               <tr>
                 <th className="px-4 py-2 text-left">Rank</th>
                 {selectedSources.map(sourceId => {
-                  const source = newsSources.find(s => s.id === sourceId)!;
+                  const source = PLACEHOLDER_SOURCES.find(s => s.id === sourceId)!;
                   return (
                     <th 
                       key={sourceId} 
