@@ -297,8 +297,8 @@
     - [x] Check for errors in browser console or network tab.
     - [x] Confirm image URLs in the grid match the expected pattern for 2025-04-18.
 - [x] **Data Contract Checks**
-    - [x] Validate that API response fields (`id`, `sourceId`, `timestamp`, `imageUrl`, etc.) match frontend expectations.
-    - [x] Ensure no ID/key mismatches that would prevent grid rendering.
+    - [x] Validate that API response fields (`id`, `short_id`, `timestamp`, `imageUrl`, etc.) match frontend expectations.
+    - [x] Ensure no key mismatches that would prevent grid rendering.
 - [x] **General**
     - [x] If any step above fails, debug that layer before proceeding.
     - [x] Review logs and API responses for clues if data is missing or not rendering.
@@ -314,11 +314,45 @@
 - Troubleshooting indicates the issue is likely in the frontend/backend data contract or mapping logic (e.g., sourceId, id, or timeSlot alignment).
 
 ### Next Steps for Debugging (to pick up later)
-- [ ] Review mapping between API response (`id`, `sourceId`, `timestamp`) and frontend grid expectations (`newsSources`, `timeSlots`).
-- [ ] Ensure that `sourceId` in API matches `_id` in frontend sources, and that `id`/`timeSlot` formats align.
-- [ ] Check if the frontend is filtering out valid API data due to mismatched IDs or time slot keys.
-- [ ] If needed, update either backend or frontend to ensure IDs and formats are consistent.
+- [ ] Review mapping between API response (`id`, `short_id`, `timestamp`) and frontend grid expectations (`newsSources`, `timeSlots`).
+- [ ] Ensure that `short_id` in API matches `short_id` in frontend sources, and that `id`/`timeSlot` formats align.
+- [ ] Check if the frontend is filtering out valid API data due to mismatched keys or time slot keys.
+- [ ] If needed, update either backend or frontend to ensure keys and formats are consistent.
 - [ ] Add logging or debugging output in the frontend to inspect what data is received and how it is mapped to the grid.
 - [ ] If the frontend expects a different date or time slot structure, update the backend to support dynamic date filtering via query params.
 
 _Reference: See project context in Scraper_Refactor.md, NewsLens_Project_Brief.md, and backend/frontend code for full data flow and contract details._
+
+## Time Slot Configuration: Canonical Source
+
+- The canonical list of daily time slots is defined in the backend at `backend/config/base.py` as `DEFAULT_CAPTURE_TIMES`:
+
+  ```python
+  DEFAULT_CAPTURE_TIMES = [
+      "06:00",
+      "09:00",
+      "12:00",
+      "15:00",
+      "18:00"
+  ]
+  ```
+
+- The frontend must maintain a matching constant in `frontend/src/constants/timeSlots.ts`:
+
+  ```ts
+  export const STANDARD_TIME_SLOTS = [
+    { id: '06:00', label: '6:00 AM' },
+    { id: '09:00', label: '9:00 AM' },
+    { id: '12:00', label: '12:00 PM' },
+    { id: '15:00', label: '3:00 PM' },
+    { id: '18:00', label: '6:00 PM' },
+  ];
+  ```
+
+- **Important:** If you update the time slots in one place, update the other to match. Add a comment referencing the other location to prevent config drift.
+
+### Source Key Explanation
+
+- `short_id` is the canonical, human-readable, and stable key for each news source (e.g., 'cnn', 'foxnews').
+- `short_id` is used for all matching and filtering in both backend and frontend.
+- `_id` (or `id`) is the MongoDB ObjectId and is only used for database operations, not for business logic or matching in the UI.

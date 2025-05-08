@@ -136,8 +136,8 @@ Make sure the backend API is available at `/api/snapshots?date=YYYY-MM-DD`
 
 ```ts
 interface NewsSnapshot {
-  id: string; // `${sourceId}-${timeSlot}`
-  source: string;
+  id: string; // `${short_id}-${timeSlot}`
+  short_id: string; // Canonical source key (e.g., 'cnn')
   time_slot: string;
   main_headline: string;
   sub_headlines: string[];
@@ -150,6 +150,12 @@ interface NewsSnapshot {
   wayback_url: string;
 }
 ```
+
+### Source Key Explanation
+
+- `short_id` is the canonical, human-readable, and stable key for each news source (e.g., 'cnn', 'foxnews').
+- `short_id` is used for all matching and filtering in both backend and frontend.
+- `_id` (or `id`) is the MongoDB ObjectId and is only used for database operations, not for business logic or matching in the UI.
 
 ---
 
