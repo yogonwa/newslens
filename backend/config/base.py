@@ -109,30 +109,35 @@ SOURCES = [
         "name": "CNN",
         "url": "https://www.cnn.com",
         "key": "cnn.com",
-        "id": "cnn"
+        "id": "cnn",
+        "short_id": "cnn"
     },
     {
         "name": "Fox News",
         "url": "https://www.foxnews.com",
         "key": "foxnews.com",
-        "id": "foxnews"
+        "id": "foxnews",
+        "short_id": "foxnews"
     },
     {
         "name": "New York Times",
         "url": "https://www.nytimes.com",
         "key": "nytimes.com",
-        "id": "nytimes"
+        "id": "nytimes",
+        "short_id": "nytimes"
     },
     {
         "name": "Washington Post",
         "url": "https://www.washingtonpost.com",
         "key": "washingtonpost.com",
-        "id": "washingtonpost"
+        "id": "washingtonpost",
+        "short_id": "washingtonpost"
     },
     {
         "name": "USA Today",
         "url": "https://www.usatoday.com",
         "key": "usatoday.com",
-        "id": "usatoday"
+        "id": "usatoday",
+        "short_id": "usatoday"
     }
 ] 
