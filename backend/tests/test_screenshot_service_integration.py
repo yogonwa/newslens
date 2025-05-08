@@ -1,6 +1,7 @@
 import pytest
 from backend.scrapers.screenshot_service import ScreenshotService
 from playwright.async_api import async_playwright
+from backend.shared.utils.timezone import et_to_utc
 
 # List of sources and their Wayback URLs
 SOURCES = [

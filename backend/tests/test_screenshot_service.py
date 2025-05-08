@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 from backend.scrapers.screenshot_service import ScreenshotService
 from io import BytesIO
+from backend.shared.utils.timezone import et_to_utc
 
 @pytest.mark.asyncio
 async def test_capture_success(monkeypatch):

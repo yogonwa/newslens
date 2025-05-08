@@ -2,6 +2,7 @@ import os
 import pytest
 from bs4 import BeautifulSoup
 from backend.scrapers.extractors import headline_extractors
+from backend.shared.utils.timezone import et_to_utc
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 

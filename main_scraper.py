@@ -25,6 +25,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from backend.db.connection import db_connection
+from backend.shared.utils.timezone import et_to_utc
+
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 get_config()
 
@@ -67,24 +69,27 @@ async def run_pipeline(start_date, end_date, times, dry_run, verbose):
         while current <= end_date:
             for source in SOURCES:
                 for time_str in times:
-                    # Compute the target datetime for this slot
-                    target_dt = datetime.combine(current.date(), datetime.strptime(time_str, "%H:%M").time())
+                    # Compute the target datetime for this slot in US/Eastern
+                    naive_dt = datetime.combine(current.date(), datetime.strptime(time_str, "%H:%M").time())
+                    # Use utility for ET→UTC conversion
+                    target_dt_utc = et_to_utc(naive_dt)
+                    # Use naive_dt (ET) for display_timestamp, target_dt_utc (UTC) for Wayback
                     summary["total"] += 1
                     context = {
                         "source": source['id'],
-                        "display_timestamp": str(target_dt),
+                        "display_timestamp": str(naive_dt),
                     }
-                    logger.info(f"Starting pipeline for {source['name']} at {target_dt}", extra={**context, "stage": "start"})
+                    logger.info(f"Starting pipeline for {source['name']} at {naive_dt}", extra={**context, "stage": "start"})
                     try:
-                        # Run the full pipeline for this source/timeslot
-                        await process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_run, verbose)
+                        # Pass both display and UTC time to process_snapshot
+                        await process_snapshot(source, naive_dt, target_dt_utc, wayback, screenshot, s3, db, dry_run, verbose)
                         summary["success"] += 1
-                        logger.info(f"Completed pipeline for {source['name']} at {target_dt}", extra={**context, "stage": "end", "status": "success"})
+                        logger.info(f"Completed pipeline for {source['name']} at {naive_dt}", extra={**context, "stage": "end", "status": "success"})
                     except Exception as e:
                         # Log and count failures
                         summary["fail"] += 1
-                        summary["failures"].append({"source": source['id'], "display_timestamp": str(target_dt), "error": str(e)})
-                        logger.error(f"Pipeline failed for {source['name']} at {target_dt}: {e}", extra={**context, "stage": "end", "status": "error", "error_message": str(e)})
+                        summary["failures"].append({"source": source['id'], "display_timestamp": str(naive_dt), "error": str(e)})
+                        logger.error(f"Pipeline failed for {source['name']} at {naive_dt}: {e}", extra={**context, "stage": "end", "status": "error", "error_message": str(e)})
             current += timedelta(days=1)
         # Log batch summary after all runs
         logger.info("Pipeline run summary: {}", summary, extra={"stage": "summary"})
@@ -101,7 +106,7 @@ async def run_pipeline(start_date, end_date, times, dry_run, verbose):
         except Exception as e:
             logger.error(f"Error during MongoDB connection cleanup: {e}")
 
-async def process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_run, verbose):
+async def process_snapshot(source, display_dt_et, target_dt_utc, wayback, screenshot, s3, db, dry_run, verbose):
     """
     Runs the full pipeline for a single source and time slot:
     1. Fetch Wayback snapshot
@@ -112,10 +117,10 @@ async def process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_r
     6. Save to MongoDB
     Logs each stage and handles errors gracefully.
     """
-    context = {"source": source['id'], "display_timestamp": str(target_dt)}
-    # 1. Fetch Wayback snapshot
+    context = {"source": source['id'], "display_timestamp": str(display_dt_et)}
+    # 1. Fetch Wayback snapshot (use UTC time)
     logger.info("Fetching Wayback snapshot", extra={**context, "stage": "fetch"})
-    snapshot = await wayback.fetch_snapshot(source['url'], target_dt)
+    snapshot = await wayback.fetch_snapshot(source['url'], target_dt_utc)
     if not snapshot:
         logger.warning("No snapshot found", extra={**context, "stage": "fetch", "status": "not_found"})
         return
@@ -164,7 +169,7 @@ async def process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_r
         cropped_img.save(output_bytes, format="PNG")
         output_bytes.seek(0)
         try:
-            s3_url = s3.upload_bytes(output_bytes.getvalue(), f"{source['id']}_{target_dt.strftime('%Y%m%d%H%M')}.png", content_type="image/png")
+            s3_url = s3.upload_bytes(output_bytes.getvalue(), f"{source['id']}_{display_dt_et.strftime('%Y%m%d%H%M')}.png", content_type="image/png")
             logger.info("Image uploaded to S3", extra={**context, "stage": "upload", "status": "success", "s3_url": s3_url})
         except Exception as e:
             logger.error(f"S3 upload failed: {e}", extra={**context, "stage": "upload", "status": "error", "error_message": str(e)})
@@ -202,8 +207,8 @@ async def process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_r
                 status="success"
             )
             doc = HeadlineDocument(
-                source_id=ObjectId(),  # You may want to use a real source ObjectId if available
-                display_timestamp=target_dt,
+                short_id=source['short_id'],
+                display_timestamp=display_dt_et,
                 actual_timestamp=snapshot['timestamp'],
                 headlines=headline_objs,
                 screenshot=screenshot_obj,
@@ -214,7 +219,7 @@ async def process_snapshot(source, target_dt, wayback, screenshot, s3, db, dry_r
         except Exception as e:
             logger.error(f"MongoDB save failed: {e}", extra={**context, "stage": "save", "status": "error", "error_message": str(e)})
 
-    print(f"[OK] {source['name']} {target_dt} processed.")
+    print(f"[OK] {source['name']} {display_dt_et} processed.")
 
 if __name__ == "__main__":
     main() 

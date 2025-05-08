@@ -14,7 +14,7 @@ def cleanup_headlines():
 def make_test_doc():
     return HeadlineDocument(
         short_id="cnn",
-        source_id=ObjectId(),
+        source_id="cnn",
         display_timestamp=datetime.utcnow(),
         actual_timestamp=datetime.utcnow(),
         headlines=[
