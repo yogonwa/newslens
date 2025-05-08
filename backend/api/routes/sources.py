@@ -16,7 +16,7 @@ class SourceOut(BaseModel):
 
 @router.get("/sources", response_model=List[SourceOut])
 def get_sources():
-    sources = list(db_ops.news_sources.find({}))
+    sources = list(db_ops.sources.find({}))
     # Convert ObjectId to str for _id
     for src in sources:
         src["_id"] = str(src["_id"])

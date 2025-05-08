@@ -13,6 +13,7 @@ def cleanup_headlines():
 
 def make_test_doc():
     return HeadlineDocument(
+        short_id="cnn",
         source_id=ObjectId(),
         display_timestamp=datetime.utcnow(),
         actual_timestamp=datetime.utcnow(),
@@ -62,6 +63,6 @@ def test_schema_validation():
     doc = make_test_doc()
     # Should not raise
     doc_dict = doc.dict()
-    assert "source_id" in doc_dict
+    assert "short_id" in doc_dict
     assert "headlines" in doc_dict
     assert isinstance(doc_dict["headlines"], list) 

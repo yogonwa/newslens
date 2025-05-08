@@ -35,9 +35,11 @@ def get_snapshots():
         # Generate presigned URLs
         image_url = s3_service.generate_presigned_url(s3_key, expires_in=3600)
         thumbnail_url = s3_service.generate_presigned_url(thumbnail_key, expires_in=3600)
-        # Map sourceId to short string
-        source_id_str = str(doc["source_id"])
-        short_source_id = SOURCE_ID_MAP.get(source_id_str, source_id_str)
+        # Use short_id if present, else fallback to mapping
+        short_source_id = doc.get("short_id")
+        if not short_source_id:
+            source_id_str = str(doc["source_id"])
+            short_source_id = SOURCE_ID_MAP.get(source_id_str, source_id_str)
         # Format timeSlotId as YYYYMMDD-HHMM from display_timestamp
         display_ts = doc["display_timestamp"]
         if hasattr(display_ts, "isoformat"):

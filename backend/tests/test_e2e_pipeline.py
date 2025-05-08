@@ -124,6 +124,7 @@ async def test_e2e_pipeline(params):
 
     # 5. Store in MongoDB
     doc = HeadlineDocument(
+        short_id=source,
         source_id=ObjectId(),
         display_timestamp=datetime.strptime(dt_str, "%Y%m%d%H%M"),
         actual_timestamp=datetime.utcnow(),

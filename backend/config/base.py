@@ -71,9 +71,8 @@ class BaseConfig:
             },
             'indexes': {
                 'headlines': [
-                    {'keys': [('source_id', 1), ('display_timestamp', -1)], 'name': 'source_time_idx'},
                     {'keys': [('display_timestamp', -1)], 'name': 'time_idx'},
-                    {'keys': [('source_id', 1)], 'name': 'source_idx'},
+                    {'keys': [('short_id', 1)], 'name': 'short_id_idx'},
                     {'keys': [('status', 1)], 'name': 'status_idx'}
                 ],
                 'sources': [

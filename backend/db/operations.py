@@ -66,31 +66,29 @@ class DatabaseOperations:
 
     # Headline Operations
     def add_headline(self, headline: HeadlineDocument) -> ObjectId:
-        """Add a new headline document."""
+        """Add a new headline document. Requires short_id."""
         result = self.headlines.insert_one(headline.dict())
         return result.inserted_id
 
     def get_headlines_by_time(self, 
                             start_time: datetime, 
                             end_time: datetime,
-                            source_ids: Optional[List[ObjectId]] = None) -> List[Dict[str, Any]]:
-        """Get headlines within a time range."""
+                            short_ids: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+        """Get headlines within a time range, filtered by short_id."""
         query = {
             'display_timestamp': {
                 '$gte': start_time,
                 '$lte': end_time
             }
         }
-        if source_ids:
-            query['source_id'] = {'$in': source_ids}
+        if short_ids:
+            query['short_id'] = {'$in': short_ids}
         return list(self.headlines.find(query))
 
-    def get_headlines_by_source(self, 
-                              source_id: ObjectId,
-                              limit: int = 100) -> List[Dict[str, Any]]:
-        """Get recent headlines for a specific source."""
+    def get_headlines_by_short_id(self, short_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+        """Get recent headlines for a specific source by short_id."""
         return list(self.headlines.find(
-            {'source_id': source_id}
+            {'short_id': short_id}
         ).sort('display_timestamp', -1).limit(limit))
 
     def update_headline(self, 

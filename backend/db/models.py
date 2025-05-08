@@ -43,7 +43,7 @@ class DocumentHeadlineMetadata(BaseModel):
 
 class HeadlineDocument(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    source_id: ObjectId
+    short_id: str  # Canonical, human-readable source key (e.g., 'cnn', 'foxnews')
     display_timestamp: datetime
     actual_timestamp: datetime
     headlines: List[Headline]
