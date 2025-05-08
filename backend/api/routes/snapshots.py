@@ -5,15 +5,6 @@ from datetime import datetime
 
 router = APIRouter()
 
-# Mapping from MongoDB ObjectId to short string source keys
-SOURCE_ID_MAP = {
-    "6807e171fdec5451bda49cfb": "cnn",
-    "6807e171fdec5451bda49cfc": "fox",
-    "6807e171fdec5451bda49cfd": "nytimes",
-    "6807e171fdec5451bda49cfe": "wapo",
-    "6807e171fdec5451bda49cff": "usatoday",
-}
-
 @router.get("/snapshots")
 def get_snapshots():
     s3_service = S3Service()
@@ -35,22 +26,22 @@ def get_snapshots():
         # Generate presigned URLs
         image_url = s3_service.generate_presigned_url(s3_key, expires_in=3600)
         thumbnail_url = s3_service.generate_presigned_url(thumbnail_key, expires_in=3600)
-        # Use short_id if present, else fallback to mapping
-        short_source_id = doc.get("short_id")
-        if not short_source_id:
-            source_id_str = str(doc["source_id"])
-            short_source_id = SOURCE_ID_MAP.get(source_id_str, source_id_str)
-        # Format timeSlotId as YYYYMMDD-HHMM from display_timestamp
+        # Use only short_id, raise if missing
+        short_id = doc.get("short_id")
+        if not short_id:
+            raise ValueError(f"Document missing short_id: {doc.get('_id')}")
+        # Format timeSlotId as YYYYMMDD-HH:MM from display_timestamp
         display_ts = doc["display_timestamp"]
         if hasattr(display_ts, "isoformat"):
             dt = display_ts
         else:
             dt = datetime.fromisoformat(str(display_ts))
-        time_slot_id = dt.strftime("%Y%m%d-%H%M")
-        snapshot_id = f"{short_source_id}-{time_slot_id}"
+        date_str = dt.strftime("%Y%m%d")
+        time_slot_id = dt.strftime("%H:%M")  # Use colon for canonical format
+        snapshot_id = f"{short_id}-{date_str}-{time_slot_id}"
         response.append({
             "id": snapshot_id,
-            "sourceId": short_source_id,
+            "short_id": short_id,
             "timestamp": dt.isoformat(),
             "mainHeadline": main_headline,
             "subHeadlines": sub_headlines,
