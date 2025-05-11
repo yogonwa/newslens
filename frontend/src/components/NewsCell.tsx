@@ -26,7 +26,7 @@ const NewsCell: React.FC<NewsCellProps> = ({ snapshot, source, onClick }) => {
 
   return (
     <div 
-      className="relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] cursor-pointer w-full h-full bg-gray-100"
+      className="relative overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] cursor-pointer w-full h-full bg-gray-100"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
