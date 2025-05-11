@@ -51,20 +51,19 @@ const Home: React.FC = () => {
     <div className="flex flex-col min-h-screen">
       <Header onSearchChange={setSearchQuery} />
       
-      <main className="flex-grow container mx-auto px-4 pt-28 pb-12">
-        <h1 className="text-3xl font-bold mb-2">Media Coverage Comparison</h1>
-        <p className="text-gray-600 mb-6">
-          See how different news outlets cover the same stories throughout the day.
-        </p>
+      <main className="flex-grow container mx-auto px-4 pb-12 pt-[61px]">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+          <h1 className="text-3xl font-bold">Media Coverage Comparison</h1>
+          <Controls 
+            sources={sources}
+            activeSourceIds={activeSourceIds}
+            onSourceToggle={toggleSource}
+            onToggleAll={toggleAllSources}
+            onDateChange={setSelectedDate}
+            selectedDate={selectedDate}
+          />
+        </div>
         
-        <Controls 
-          sources={sources}
-          activeSourceIds={activeSourceIds}
-          onSourceToggle={toggleSource}
-          onToggleAll={toggleAllSources}
-          onDateChange={setSelectedDate}
-          selectedDate={selectedDate}
-        />
         {isSourcesLoading ? (
           <div className="text-center py-12">Loading sources...</div>
         ) : isSourcesError ? (

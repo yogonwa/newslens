@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Filter, Maximize2, Minimize2 } from 'lucide-react';
 import { NewsSource } from '../types';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import { Popover } from '@headlessui/react';
 
 interface ControlsProps {
   sources: NewsSource[];
@@ -20,6 +23,7 @@ const Controls: React.FC<ControlsProps> = ({
   selectedDate,
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
   const handlePreviousDay = () => {
     const newDate = new Date(selectedDate);
@@ -56,10 +60,25 @@ const Controls: React.FC<ControlsProps> = ({
             <ChevronLeft size={20} />
           </button>
           
-          <div className="flex items-center px-3 py-2 bg-gray-100 rounded-md">
-            <Calendar size={18} className="mr-2 text-blue-600" />
-            <span className="font-medium">{formatDate(selectedDate)}</span>
-          </div>
+          <Popover className="relative">
+            <Popover.Button as="div" className="flex items-center px-3 py-2 bg-gray-100 rounded-md cursor-pointer select-none" onClick={() => setIsCalendarOpen(!isCalendarOpen)}>
+              <Calendar size={18} className="mr-2 text-blue-600" />
+              <span className="font-medium">{formatDate(selectedDate)}</span>
+            </Popover.Button>
+            <Popover.Panel className="absolute z-20 mt-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
+              <DayPicker
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  if (date) {
+                    onDateChange(date);
+                    setIsCalendarOpen(false);
+                  }
+                }}
+                defaultMonth={selectedDate}
+              />
+            </Popover.Panel>
+          </Popover>
           
           <button 
             onClick={handleNextDay}
@@ -102,14 +121,14 @@ const Controls: React.FC<ControlsProps> = ({
       {isFilterOpen && (
         <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {sources.map((source) => {
-            const isActive = activeSourceIds.includes(source.id);
+            const isActive = activeSourceIds.includes(source.short_id);
             return (
               <div 
-                key={source.id} 
+                key={source.short_id} 
                 className={`flex items-center p-2 rounded-md cursor-pointer ${
                   isActive ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'
                 }`}
-                onClick={() => onSourceToggle(source.id)}
+                onClick={() => onSourceToggle(source.short_id)}
               >
                 <div 
                   className="w-4 h-4 rounded-full mr-2"

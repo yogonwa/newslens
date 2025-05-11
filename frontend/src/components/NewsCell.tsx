@@ -31,18 +31,10 @@ const NewsCell: React.FC<NewsCellProps> = ({ snapshot, source, onClick }) => {
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
     >
-      {/* Source badge */}
-      <div 
-        className="absolute top-2 left-2 z-10 px-2 py-1 rounded text-xs font-bold text-white"
-        style={{ backgroundColor: source.color }}
-      >
-        {source.name}
-      </div>
-      
       {/* Thumbnail */}
       <img 
         src={snapshot.thumbnailUrl} 
-        alt={`${source.name} homepage`}
+        alt="News homepage"
         className="w-full h-full object-cover transition-opacity duration-300"
         style={{ opacity: isHovered ? 0.3 : 1 }}
       />

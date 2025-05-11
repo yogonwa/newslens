@@ -51,37 +51,40 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
 
   return (
     <div className="w-full">
-      {/* Time slot headers */}
+      {/* Source headers */}
       <div className="flex">
         <div className="w-36 flex-shrink-0"></div>
         <div className="flex-1 grid grid-cols-5 gap-4">
-          {timeSlots.map((slot) => (
-            <div key={slot.id} className="text-center">
-              <h3 className="font-medium text-gray-800">{slot.label}</h3>
+          {sources.map((source) => (
+            <div key={source.short_id} className="flex flex-col items-center justify-center">
+              <div
+                className="px-3 py-1 rounded font-bold text-white mb-1 text-center"
+                style={{ backgroundColor: source.color, minWidth: '80px' }}
+              >
+                {source.name}
+              </div>
             </div>
           ))}
         </div>
       </div>
       
-      {/* Source rows */}
-      {sources.map((source) => (
-        <div key={source.short_id} className="flex mb-8">
-          {/* Source name column */}
+      {/* Time slot rows */}
+      {timeSlots.map((slot) => (
+        <div key={slot.id} className="flex mb-8">
+          {/* Time slot label column */}
           <div className="w-36 flex-shrink-0 pr-4 flex items-center">
             <div className="flex items-center">
-              <div className="w-3 h-12 rounded-full mr-2" style={{ backgroundColor: source.color }}></div>
-              <span className="font-medium">{source.name}</span>
+              <div className="w-3 h-12 rounded-full mr-2 bg-gray-400"></div>
+              <span className="font-medium">{slot.label}</span>
             </div>
           </div>
           
           {/* News snapshots grid */}
           <div className="flex-1 grid grid-cols-5 gap-4">
-            {timeSlots.map((slot) => {
-              const snapshotsForTimeSlot = getSnapshotsByTimeSlot(slot.id);
-              const snapshotForSource = snapshotsForTimeSlot.find(
-                snapshot => snapshot.short_id === source.short_id
+            {sources.map((source) => {
+              const snapshotForSource = snapshots.find(
+                snapshot => snapshot.short_id === source.short_id && snapshot.id.endsWith(`-${slot.id}`)
               );
-              
               // Skip rendering if filtered out by search
               if (
                 searchQuery.trim() !== '' && 
@@ -89,14 +92,13 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
                 !filteredSnapshots.some(s => s.id === snapshotForSource.id)
               ) {
                 return (
-                  <div key={`${source.short_id}-${slot.id}`} className="aspect-[3/2] rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 text-sm">
+                  <div key={`${slot.id}-${source.short_id}`} className="aspect-[3/2] rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 text-sm">
                     No match
                   </div>
                 );
               }
-              
               return snapshotForSource ? (
-                <div key={`${source.short_id}-${slot.id}`} className="aspect-[3/2] transition-all duration-300">
+                <div key={`${slot.id}-${source.short_id}`} className="aspect-[3/2] transition-all duration-300">
                   <NewsCell 
                     snapshot={snapshotForSource} 
                     source={source}
@@ -104,7 +106,7 @@ const NewsGrid: React.FC<NewsGridProps> = ({ snapshots, sources, timeSlots, sear
                   />
                 </div>
               ) : (
-                <div key={`${source.short_id}-${slot.id}`} className="aspect-[3/2] rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400">
+                <div key={`${slot.id}-${source.short_id}`} className="aspect-[3/2] rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400">
                   No data
                 </div>
               );
