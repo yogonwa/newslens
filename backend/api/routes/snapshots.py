@@ -1,16 +1,20 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query, HTTPException
 from backend.db.operations import db_ops
 from backend.services.s3_service import S3Service
-from datetime import datetime
+from datetime import datetime, timedelta
 
 router = APIRouter()
 
 @router.get("/snapshots")
-def get_snapshots():
+def get_snapshots(date: str = Query(..., description="Date in YYYY-MM-DD format")):
     s3_service = S3Service()
-    # Filter for documents with display_timestamp on 2025-04-18
-    start_dt = datetime(2025, 4, 18)
-    end_dt = datetime(2025, 4, 19)
+    try:
+        # Parse the date string
+        start_dt = datetime.strptime(date, "%Y-%m-%d")
+        end_dt = start_dt + timedelta(days=1)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
+
     docs = db_ops.headlines.find({
         "display_timestamp": {"$gte": start_dt, "$lt": end_dt}
     })
